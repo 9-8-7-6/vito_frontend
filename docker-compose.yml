@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  vue-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: ["npm", "run", "dev", "--", "--host"]  # 讓 Vite 對外開放
+    stdin_open: true
+    tty: true
+    restart: always
