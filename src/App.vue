@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { ref } from 'vue'
-const msg = ref("This is a dynamic message")
-const rawHtml = ref("<h1>This is HTML content</h1>") // 定義 rawHtml
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <span>{{ msg }}</span>
-      <p>{{ rawHtml }}</p>
-      <p><span v-html="rawHtml"></span></p>
-      Using text interpolation: <span style="color: red">This should be red.</span>
+      <h1 class="custom-title">Vito</h1>
+      <p style="color:gainsboro">Keep grinding !<br> your life can change in one year!</p>
+      <span style="font-size: 20px; color: turquoise">Finance is the key to freedom!</span>
+      <br><img src="../rich_man.png" alt="rich man" width="200" height="200">
     </div>
   </header>
-
-  <RouterView />
 </template>
 
 <style scoped>
@@ -27,6 +23,11 @@ header {
 .logo {
   display: block;
   margin: 0 auto 2rem;
+}
+
+.custom-title {
+  font-size: 60px;
+  color: bisque;
 }
 
 nav {
