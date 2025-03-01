@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+const msg = ref("This is a dynamic message")
+const rawHtml = ref("<h1>This is HTML content</h1>") // 定義 rawHtml
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+      <span>{{ msg }}</span>
+      <p>{{ rawHtml }}</p>
+      <p><span v-html="rawHtml"></span></p>
+      Using text interpolation: <span style="color: red">This should be red.</span>
     </div>
   </header>
 
