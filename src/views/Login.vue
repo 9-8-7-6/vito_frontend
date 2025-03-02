@@ -20,6 +20,12 @@ const handleLogin = async () => {
         errorMessage.value = error.error || "Login failed"
     }
 }
+
+const handleLogout = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    router.push('/login')
+}
 </script>
 
 <template>
@@ -50,6 +56,10 @@ button {
   background-color: blue;
   color: white;
   border: none;
+}
+.logout-button {
+  margin-top: 20px;
+  background-color: red;
 }
 .error {
   color: red;

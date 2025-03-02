@@ -3,8 +3,8 @@ import Home from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 
 const routes = [
-  { path: '/', component: () => import('../views/HomeView.vue'), meta: { requiresAuth: true } },
-  { path: '/login', component: () => import('../views/Login.vue') },
+  { path: '/', component: Home, meta: { requiresAuth: true } },
+  { path: '/login', component: Login },
 ]
 
 
