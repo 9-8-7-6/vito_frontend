@@ -7,14 +7,41 @@ import { ref } from 'vue'
   <header>
     <div class="wrapper">
       <h1 class="custom-title">Vito</h1>
-      <p style="color:gainsboro">Keep grinding !<br> your life can change in one year!</p>
-      <span style="font-size: 20px; color: turquoise">Finance is the key to freedom!</span>
+      <mark><em><p style="color:gainsboro; font-size:200%;">Keep grinding !<br> your life can change in one year!</p></em></mark>
+      <span style="font-size: 20px; color: turquoise; padding: 5px;">Finance is the key to freedom!</span>
+      <div><a href="mailto:vito.lin.company@gmail.com">Send email</a></div>
       <br><img src="../rich_man.png" alt="rich man" width="200" height="200">
     </div>
   </header>
+  <router-view />
 </template>
 
 <style scoped>
+
+a:link {
+  color: green;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: pink;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: red;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:active {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
