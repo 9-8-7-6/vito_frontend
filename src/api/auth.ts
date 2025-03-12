@@ -44,5 +44,16 @@ export const loginUser = async (credentials: Credentials) => {
 }
 
 export const logoutUser = async () => {
-  return axios.post(`${API_BASE_URL}/logout`)
+  const url = `${API_BASE_URL}/logout`
+  console.log(`Sending logout request to`, url)
+  try {
+    return axios.post(url)
+  } catch (error) {
+    if (error.response) {
+      console.error('Logout API Error:', error.response.data)
+    } else {
+      console.error('Logout API Request Failed:', error.message)
+    }
+    throw error
+  }
 }
