@@ -19,10 +19,6 @@ const handleLogout = () => {
       <mark><em><p style="color:gainsboro; font-size:200%;">Keep grinding !<br> your life can change in one year!</p></em></mark>
       <span style="font-size: 20px; color: turquoise; padding: 5px;">Finance is the key to freedom!</span>
       <div><a href="mailto:vito.lin.company@gmail.com">Send email</a></div>
-      <div><a href="https://www.w3schools.com/" target="_top" title="w3s">Visit W3Schools.com!</a></div>
-      <br><img src="../rich_man.png" alt="rich man" width="200" height="200">
-
-      <button v-if="isAuthenticated" @click="handleLogout" class="logout-button">Logout</button>
     </div>
   </header>
   <router-view />
