@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <h2>Register</h2>
     <form @submit.prevent="handleRegister">
       <input v-model="username" type="text" placeholder="Username" required />
       <input v-model="email" type="email" placeholder="Email" required />
