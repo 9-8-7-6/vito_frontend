@@ -18,7 +18,18 @@ export const registerUser = async (userData: RegisterData) => {
 }
 
 export const loginUser = async (credentials: Credentials) => {
-  return axios.post(`${API_BASE_URL}/login`, credentials)
+  const url = `${API_BASE_URL}/login`
+  console.log(`Sending login request to`, url)
+  try {
+    return axios.post(`${API_BASE_URL}/login`, credentials)
+  } catch (error) {
+    if (error.response) {
+      console.error('Login API Error:', error.response.data)
+    } else {
+      console.error('Login API Request Failed:', error.message)
+    }
+    throw error
+  }
 }
 
 export const logoutUser = async () => {
