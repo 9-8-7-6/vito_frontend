@@ -11,19 +11,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
-const authStore = useAuthStore();
-const router = useRouter();
-const email = ref('');
-const password = ref('');
+const authStore = useAuthStore()
+const router = useRouter()
+const email = ref('')
+const password = ref('')
 
 const handleLogin = async () => {
-  await authStore.login({ email: email.value, password: password.value });
-  router.push('/');
-};
+  await authStore.login({ email: email.value, password: password.value })
+  router.push('/')
+}
 </script>
 
 <style>

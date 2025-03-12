@@ -6,13 +6,12 @@ import Register from '../views/RegisterView.vue'
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login },
-  { path: '/register', name: 'Register', component: Register }
+  { path: '/register', name: 'Register', component: Register },
 ]
-
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 router.beforeEach(async (to, from, next) => {
@@ -34,13 +33,12 @@ async function checkAuthStatus() {
   try {
     const response = await fetch('/api/auth/check', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
     return response.ok
   } catch (error) {
     return false
   }
 }
-
 
 export default router

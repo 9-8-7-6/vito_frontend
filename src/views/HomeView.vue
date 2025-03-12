@@ -8,11 +8,11 @@
 </template>
 
 <script setup>
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth'
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
 const handleLogout = () => {
-  authStore.logout();
-};
+  authStore.logout()
+}
 </script>

@@ -6,9 +6,9 @@ const router = useRouter()
 const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 
 const handleLogout = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    router.push('/login')
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  router.push('/login')
 }
 </script>
 
@@ -16,8 +16,17 @@ const handleLogout = () => {
   <header>
     <div class="wrapper">
       <h1 class="custom-title">Vito</h1>
-      <mark><em><p style="color:gainsboro; font-size:200%;">Keep grinding !<br> your life can change in one year!</p></em></mark>
-      <span style="font-size: 20px; color: turquoise; padding: 5px;">Finance is the key to freedom!</span>
+      <mark
+        ><em
+          ><p style="color: gainsboro; font-size: 200%">
+            Keep grinding !<br />
+            your life can change in one year!
+          </p></em
+        ></mark
+      >
+      <span style="font-size: 20px; color: turquoise; padding: 5px"
+        >Finance is the key to freedom!</span
+      >
       <div><a href="mailto:vito.lin.company@gmail.com">Send email</a></div>
     </div>
   </header>
@@ -25,7 +34,6 @@ const handleLogout = () => {
 </template>
 
 <style scoped>
-
 a:link {
   color: green;
   background-color: transparent;
