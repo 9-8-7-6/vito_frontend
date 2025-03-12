@@ -1,21 +1,18 @@
-<script setup lang="ts">
-</script>
-
 <template>
-  <main>
-    <h1>Welcome to Vito homepage</h1>
-    <p>We provide excellent bookeeping product!</p>
-  </main>
+  <div class="container">
+    <h2>Welcome to the homepage</h2>
+    <p v-if="authStore.user">您好，{{ authStore.user.email }}</p>
+    <button v-if="authStore.user" @click="handleLogout">Logout</button>
+    <router-link v-else to="/login">Login</router-link>
+  </div>
 </template>
 
-<style scoped>
-h1 {
-  color: #42b983;
-  text-align: center;
-}
+<script setup>
+import { useAuthStore } from '@/stores/auth';
 
-p {
-  text-align: center;
-  font-size: 18px;
-}
-</style>
+const authStore = useAuthStore();
+
+const handleLogout = () => {
+  authStore.logout();
+};
+</script>
