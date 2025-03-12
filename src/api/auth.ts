@@ -14,14 +14,25 @@ export interface Credentials {
 }
 
 export const registerUser = async (userData: RegisterData) => {
-  return axios.post(`${API_BASE_URL}/register`, userData)
+  const url = `${API_BASE_URL}/register`
+  console.log(`Sending register request to`, url)
+  try {
+    return axios.post(url, userData)
+  } catch (error) {
+    if (error.response) {
+      console.error('Register API Error:', error.response.data)
+    } else {
+      console.error('Register API Request Failed:', error.message)
+    }
+    throw error
+  }
 }
 
 export const loginUser = async (credentials: Credentials) => {
   const url = `${API_BASE_URL}/login`
   console.log(`Sending login request to`, url)
   try {
-    return axios.post(`${API_BASE_URL}/login`, credentials)
+    return axios.post(url, credentials)
   } catch (error) {
     if (error.response) {
       console.error('Login API Error:', error.response.data)
