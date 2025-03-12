@@ -1,67 +1,47 @@
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { login } from '../api'
-
-const username = ref('')
-const password = ref('')
-const errorMessage = ref('')
-const router = useRouter()
-
-const handleLogin = async () => {
-    try {
-        const data = await login(username.value, password.value)
-        
-        localStorage.setItem('access_token', data.access)
-        localStorage.setItem('refresh_token', data.refresh)
-
-        router.push('/')
-    } catch (error) {
-        errorMessage.value = error.error || "Login failed"
-    }
-}
-
-const handleLogout = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    router.push('/login')
-}
-</script>
-
 <template>
-  <div class="login-container">
+  <div class="container">
     <h2>Login</h2>
-    <input v-model="username" placeholder="Username" />
-    <input v-model="password" type="password" placeholder="Password" />
-    <button @click="handleLogin">Login</button>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <form @submit.prevent="handleLogin">
+      <input v-model="email" type="email" placeholder="Email" required />
+      <input v-model="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <p><router-link to="/register">Register</router-link></p>
   </div>
 </template>
 
-<style scoped>
-.login-container {
-  max-width: 400px;
-  margin: 0 auto;
+<script setup>
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const router = useRouter();
+const email = ref('');
+const password = ref('');
+
+const handleLogin = async () => {
+  await authStore.login({ email: email.value, password: password.value });
+  router.push('/');
+};
+</script>
+
+<style>
+.container {
+  max-width: 300px;
+  margin: auto;
   text-align: center;
 }
 input {
   display: block;
   width: 100%;
-  margin: 10px 0;
-  padding: 10px;
+  margin-bottom: 10px;
+  padding: 8px;
 }
 button {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   background-color: blue;
   color: white;
-  border: none;
-}
-.logout-button {
-  margin-top: 20px;
-  background-color: red;
-}
-.error {
-  color: red;
 }
 </style>
