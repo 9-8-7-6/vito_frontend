@@ -15,8 +15,10 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await loginUser(credentials)
       user.value = response.data.user
       localStorage.setItem('user', JSON.stringify(response.data.user))
+      return true
     } catch (error) {
       console.error('Login failed:', error)
+      return false
     }
   }
 

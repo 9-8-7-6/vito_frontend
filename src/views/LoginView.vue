@@ -21,11 +21,11 @@ const username = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-  try {
-    await authStore.login({ username: username.value, password: password.value })
+  const success = await authStore.login({ username: username.value, password: password.value })
+  if (success) {
     console.log('login successfully')
     router.push('/')
-  } catch {
+  } else {
     console.error('Login failed:', error)
     alert('Login failed. Please check your username and password.')
   }
