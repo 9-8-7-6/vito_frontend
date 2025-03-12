@@ -2,7 +2,7 @@
   <div class="container">
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
-      <input v-model="email" type="email" placeholder="Email" required />
+      <input v-model="username" type="username" placeholder="Username" required />
       <input v-model="password" type="password" placeholder="Password" required />
       <button type="submit">Login</button>
     </form>
@@ -17,11 +17,11 @@ import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
-const email = ref('')
+const username = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-  await authStore.login({ email: email.value, password: password.value })
+  await authStore.login({ username: username.value, password: password.value })
   router.push('/')
 }
 </script>
