@@ -32,9 +32,12 @@ export const loginUser = async (credentials: Credentials) => {
   const url = `${API_BASE_URL}/login`
   console.log(`Sending login request to`, url)
   try {
-    return axios.post(url, credentials, {
-      withCredentials: true,
-    })
+    const response = await axios.post(url, credentials, { withCredentials: true })
+    if (response.data && response.data.token) {
+      console.log('Login successful, setting cookie')
+      setCookie('id', response.data.token, { path: '/', secure: true })
+    }
+    return response
   } catch (error) {
     let errorMessage = 'Failed to do something exceptional'
     if (error instanceof Error) {
