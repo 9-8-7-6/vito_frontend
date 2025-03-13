@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { setCookie } from 'typescript-cookie'
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
