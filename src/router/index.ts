@@ -27,7 +27,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 async function checkAuthStatus() {
-  const token = sessionStorage.getItem('session_id')
+  const token = getCookie('id')
   if (!token) return false
 
   try {
@@ -39,6 +39,12 @@ async function checkAuthStatus() {
   } catch (error) {
     return false
   }
+}
+
+function getCookie(name: String) {
+  const cookies = document.cookie.split('; ')
+  const cookie = cookies.find((row) => row.startsWith(name + '='))
+  return cookie ? cookie.split('=')[1] : null
 }
 
 export default router
