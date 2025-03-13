@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { setCookie } from 'typescript-cookie'
+import { setCookie, getCookie } from 'typescript-cookie'
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
@@ -59,5 +59,25 @@ export const logoutUser = async () => {
       errorMessage = error.message
     }
     console.log(errorMessage)
+  }
+}
+
+export const AuthCheck = async () => {
+  const url = `${API_BASE_URL}/auth/check`
+
+  const token = getCookie('id')
+  console.log('Checking authentication, token:', token)
+
+  if (!token) {
+    console.log("AuthCheck doesn't get cookie named id, something wrong happens")
+    return false
+  }
+
+  try {
+    const response = await axios.post(`${url}`, {}, { withCredentials: true })
+    return response.status === 200
+  } catch (error) {
+    console.error('Auth check failed:', error)
+    return false
   }
 }

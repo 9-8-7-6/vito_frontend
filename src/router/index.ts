@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getCookie } from 'typescript-cookie'
+import { AuthCheck } from '../api/auth.ts'
 import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
@@ -17,7 +17,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   await new Promise((resolve) => setTimeout(resolve, 200))
-  const isAuthenticated = await checkAuthStatus()
+  const isAuthenticated = await AuthCheck()
   console.log('isAuthenticated', isAuthenticated)
   if (to.meta.requiresAuth && !isAuthenticated) {
     console.log('User not authenticated, redirecting to /login')
@@ -29,21 +29,5 @@ router.beforeEach(async (to, from, next) => {
     next()
   }
 })
-
-async function checkAuthStatus() {
-  const token = getCookie('id')
-  console.log('token', token)
-  if (!token) return false
-
-  try {
-    const response = await fetch('/api/auth/check', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return response.ok
-  } catch (error) {
-    return false
-  }
-}
 
 export default router
