@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getCookie } from 'typescript-cookie'
 import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
@@ -15,6 +16,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  await new Promise((resolve) => setTimeout(resolve, 200))
   const isAuthenticated = await checkAuthStatus()
   console.log('isAuthenticated', isAuthenticated)
   if (to.meta.requiresAuth && !isAuthenticated) {
@@ -30,6 +32,7 @@ router.beforeEach(async (to, from, next) => {
 
 async function checkAuthStatus() {
   const token = getCookie('id')
+  console.log('token', token)
   if (!token) return false
 
   try {
@@ -41,12 +44,6 @@ async function checkAuthStatus() {
   } catch (error) {
     return false
   }
-}
-
-function getCookie(name: String) {
-  const cookies = document.cookie.split('; ')
-  const cookie = cookies.find((row) => row.startsWith(name + '='))
-  return cookie ? cookie.split('=')[1] : null
 }
 
 export default router
