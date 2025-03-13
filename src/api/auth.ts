@@ -19,12 +19,11 @@ export const registerUser = async (userData: RegisterData) => {
   try {
     return axios.post(url, userData)
   } catch (error) {
-    if (error.response) {
-      console.error('Register API Error:', error.response.data)
-    } else {
-      console.error('Register API Request Failed:', error.message)
+    let errorMessage = 'Failed to do something exceptional'
+    if (error instanceof Error) {
+      errorMessage = error.message
     }
-    throw error
+    console.log(errorMessage)
   }
 }
 
@@ -34,12 +33,11 @@ export const loginUser = async (credentials: Credentials) => {
   try {
     return axios.post(url, credentials)
   } catch (error) {
-    if (error.response) {
-      console.error('Login API Error:', error.response.data)
-    } else {
-      console.error('Login API Request Failed:', error.message)
+    let errorMessage = 'Failed to do something exceptional'
+    if (error instanceof Error) {
+      errorMessage = error.message
     }
-    throw error
+    console.log(errorMessage)
   }
 }
 
@@ -49,11 +47,10 @@ export const logoutUser = async () => {
   try {
     return axios.post(url)
   } catch (error) {
-    if (error.response) {
-      console.error('Logout API Error:', error.response.data)
-    } else {
-      console.error('Logout API Request Failed:', error.message)
+    let errorMessage = 'Failed to do something exceptional'
+    if (error instanceof Error) {
+      errorMessage = error.message
     }
-    throw error
+    console.log(errorMessage)
   }
 }
