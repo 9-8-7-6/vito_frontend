@@ -16,10 +16,12 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = await checkAuthStatus()
-
+  console.log('isAuthenticated', isAuthenticated)
   if (to.meta.requiresAuth && !isAuthenticated) {
+    console.log('User not authenticated, redirecting to /login')
     next('/login')
   } else if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
+    console.log('User is authenticated, redirecting to /')
     next('/')
   } else {
     next()
