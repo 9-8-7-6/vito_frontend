@@ -38,6 +38,7 @@ export const loginUser = async (credentials: Credentials) => {
       errorMessage = error.message
     }
     console.log(errorMessage)
+    return null
   }
 }
 
