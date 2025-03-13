@@ -31,7 +31,9 @@ export const loginUser = async (credentials: Credentials) => {
   const url = `${API_BASE_URL}/login`
   console.log(`Sending login request to`, url)
   try {
-    return axios.post(url, credentials)
+    return axios.post(url, credentials, {
+      withCredentials: true,
+    })
   } catch (error) {
     let errorMessage = 'Failed to do something exceptional'
     if (error instanceof Error) {
