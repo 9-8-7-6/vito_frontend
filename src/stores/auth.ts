@@ -13,6 +13,11 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials: Credentials) => {
     try {
       const response = await loginUser(credentials)
+      if (!response) {
+        console.error("Login failed: No response from server")
+        return false
+      }  
+      console.log(`The response of login api is `, response)
       user.value = response.data.user
       localStorage.setItem('user', JSON.stringify(response.data.user))
       return true
