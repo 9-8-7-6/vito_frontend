@@ -16,7 +16,6 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  await new Promise((resolve) => setTimeout(resolve, 200))
   const isAuthenticated = await AuthCheck()
   console.log('isAuthenticated', isAuthenticated)
   if (to.meta.requiresAuth && !isAuthenticated) {

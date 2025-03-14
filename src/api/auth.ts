@@ -30,10 +30,10 @@ export const registerUser = async (userData: RegisterData) => {
 
 export const loginUser = async (credentials: Credentials) => {
   const url = `${API_BASE_URL}/login`
-  console.log(`Sending login request to`, url)
+  console.log(`Sending login request to`, url, `body is`, credentials)
   try {
     const response = await axios.post(url, credentials, { withCredentials: true })
-    console.log(`Sending login request to`, url, `response is`, response)
+    console.log(`Response of login request is`, response)
     if (response.data && response.data.token) {
       console.log('Login successful, setting cookie')
       setCookie('id', response.data.token, { path: '/' })
