@@ -14,5 +14,6 @@ const authStore = useAuthStore()
 
 const handleLogout = () => {
   authStore.logout()
+  window.location.reload()
 }
 </script>
