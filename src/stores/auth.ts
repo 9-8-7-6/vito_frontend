@@ -8,7 +8,7 @@ interface Credentials {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<any>(null)
+  const user = ref<any>(JSON.parse(localStorage.getItem('user') || 'null'))
 
   const login = async (credentials: Credentials) => {
     try {

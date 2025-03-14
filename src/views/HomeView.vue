@@ -9,10 +9,12 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth'
+import { AuthCheck } from '../api/auth'
 
 const authStore = useAuthStore()
 
 const handleLogout = () => {
   authStore.logout()
+  window.location.reload()
 }
 </script>
