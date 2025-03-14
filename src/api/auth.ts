@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { setCookie, getCookie } from 'typescript-cookie'
+import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
@@ -33,6 +33,7 @@ export const loginUser = async (credentials: Credentials) => {
   console.log(`Sending login request to`, url)
   try {
     const response = await axios.post(url, credentials, { withCredentials: true })
+    console.log(`Sending login request to`, url, `response is`, response)
     if (response.data && response.data.token) {
       console.log('Login successful, setting cookie')
       setCookie('id', response.data.token, { path: '/', secure: true })
@@ -52,7 +53,18 @@ export const logoutUser = async () => {
   const url = `${API_BASE_URL}/logout`
   console.log(`Sending logout request to`, url)
   try {
-    return axios.post(url)
+    const response = await axios.post(
+      url,
+      {},
+      {
+        withCredentials: true,
+      },
+    )
+    if (response.data && response.data.token) {
+      console.log('Logout successful, cleaning cookie')
+      removeCookie('id', { path: '/' })
+    }
+    return response
   } catch (error) {
     let errorMessage = 'Failed to do something exceptional'
     if (error instanceof Error) {
