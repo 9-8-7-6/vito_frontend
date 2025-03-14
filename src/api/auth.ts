@@ -36,7 +36,7 @@ export const loginUser = async (credentials: Credentials) => {
     console.log(`Sending login request to`, url, `response is`, response)
     if (response.data && response.data.token) {
       console.log('Login successful, setting cookie')
-      setCookie('id', response.data.token, { path: '/', secure: true })
+      setCookie('id', response.data.token, { path: '/' })
     }
     return response
   } catch (error) {
