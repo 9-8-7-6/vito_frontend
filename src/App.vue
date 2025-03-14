@@ -1,19 +1,15 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
+import NavBar from '@/views/NavBar.vue'
 
 const router = useRouter()
 const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
-
-const handleLogout = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  router.push('/login')
-}
 </script>
 
 <template>
   <header>
+    <NavBar />
     <div class="wrapper">
       <h1 class="custom-title">Vito</h1>
       <mark
