@@ -3,12 +3,14 @@ import { AuthCheck } from '../api/auth.ts'
 import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
+import Asset from '../views/AssetView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
+  { path: '/asset', name: 'Asset', component: Asset },
 ]
 
 const router = createRouter({
