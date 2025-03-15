@@ -6,12 +6,14 @@
         <tr>
           <th>Asset Type</th>
           <th>Balance</th>
+          <th>Last time updated</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(asset, index) in assets" :key="index">
-          <td>{{ asset.type }}</td>
+          <td>{{ asset.asset_type }}</td>
           <td>{{ asset.balance }}</td>
+          <td>{{ asset.updated_at }}</td>
         </tr>
       </tbody>
     </table>
@@ -59,6 +61,6 @@ th {
 }
 
 td {
-  background-color: #f4f4f4;
+  background-color: #2c2b2b;
 }
 </style>
