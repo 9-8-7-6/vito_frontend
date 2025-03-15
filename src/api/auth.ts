@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 
-const API_BASE_URL = 'http://localhost:8000/api'
+const API_BASE_URL = 'http://localhost:8000'
 
 export interface RegisterData {
   username: string
