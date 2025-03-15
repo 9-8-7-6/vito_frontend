@@ -16,9 +16,12 @@ export const assetRequest = async () => {
 
   try {
     const parsedUser: Userid = JSON.parse(userData)
-    const url = `${API_BASE_URL}/asset`
-    console.log(`Sending request for ${parsedUser.id} asset`)
-    return axios.post(url, parsedUser)
+    const url = `${API_BASE_URL}/assets/${parsedUser.id}`
+    const response = await axios.get(url)
+    console.log(
+      `Sending request to url ${url} for ${parsedUser.id} asset, response is ${JSON.stringify(response, null, 2)}`,
+    )
+    return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
