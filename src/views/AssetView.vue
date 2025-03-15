@@ -1,9 +1,10 @@
 <template>
   <div>
-    <h1>Asset</h1>
+    <h3>Asset</h3>
     <table>
       <thead>
         <tr>
+          <th>Number</th>
           <th>Asset Type</th>
           <th>Balance</th>
           <th>Last time updated</th>
@@ -11,6 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="(asset, index) in assets" :key="index">
+          <td>{{ index + 1 }}</td>
           <td>{{ asset.asset_type }}</td>
           <td>{{ asset.balance }}</td>
           <td>{{ asset.updated_at }}</td>
