@@ -10,7 +10,7 @@ const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
 <template>
   <header>
     <NavBar />
-    <div class="wrapper">
+    <div class="wrapper" v-if="$route.path == '/'">
       <h1 class="custom-title">Vito</h1>
       <mark
         ><em
