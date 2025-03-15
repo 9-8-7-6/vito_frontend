@@ -10,6 +10,7 @@
           >Register</router-link
         >
         <router-link v-if="!authStore.user" to="/login" class="dropdown-item">Login</router-link>
+        <router-link v-if="authStore.user" to="/asset" class="dropdown-item">Asset</router-link>
         <button v-if="authStore.user" @click="handleLogout" class="dropdown-item">Logout</button>
       </div>
     </div>
