@@ -33,7 +33,8 @@ const toggleDropdown = () => {
 
 const handleLogout = () => {
   authStore.logout()
-  router.push('/')
+  router.push('/login')
+  window.reload()
   dropdownVisible.value = false
 }
 </script>
