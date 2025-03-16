@@ -4,6 +4,7 @@ import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
 import Asset from '../views/AssetView.vue'
+import Transaction from '../views/TransactionView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -11,6 +12,12 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
   { path: '/asset', name: 'Asset', component: Asset, meta: { requiresAuth: true } },
+  {
+    path: '/transaction',
+    name: 'Transaction',
+    component: Transaction,
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
