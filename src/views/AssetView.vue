@@ -1,54 +1,74 @@
 <template>
   <div class="container">
-    <table>
-      <thead>
-        <tr>
-          <th>Number</th>
-          <th>Asset Type</th>
-          <th>Balance</th>
-          <th>Last time updated</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(asset, index) in assets" :key="index">
-          <td>{{ index + 1 }}</td>
-          <td>
-            <button
-              v-if="editingTypeId !== asset.id"
-              class="asset-type-button"
-              @click="startEditingType(asset.id, asset.asset_type)"
-            >
-              {{ asset.asset_type }}
-            </button>
-            <input
-              v-else
-              class="asset-type-input"
-              v-model="editedTypeValue"
-              type="text"
-              @keyup.enter="handleUpdateAssetType(asset.id, asset.balance)"
-              @blur="cancelEditingType"
-            />
-          </td>
-          <td>
-            <button v-if="editingId !== asset.id" @click="startEditing(asset.id, asset.balance)">
-              {{ asset.balance }}
-            </button>
-            <input
-              v-else
-              v-model="editedValue"
-              type="number"
-              @keyup.enter="handleUpdateAsset(asset.id, asset.asset_type)"
-              @blur="cancelEditing"
-            />
-          </td>
-          <td>{{ asset.updated_at }}</td>
-          <td>
-            <button class="action-button" @click="handleDeleteAsset(asset.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Asset Type</th>
+            <th>Balance</th>
+            <th>Last time updated</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(asset, index) in paginatedAssets" :key="asset.id">
+            <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
+            <td>
+              <button
+                v-if="editingTypeId !== asset.id"
+                class="asset-type-button"
+                @click="startEditingType(asset.id, asset.asset_type)"
+              >
+                {{ asset.asset_type }}
+              </button>
+              <input
+                v-else
+                class="asset-type-input"
+                v-model="editedTypeValue"
+                type="text"
+                @keyup.enter="handleUpdateAssetType(asset.id, asset.balance)"
+                @blur="cancelEditingType"
+              />
+            </td>
+            <td>
+              <button v-if="editingId !== asset.id" @click="startEditing(asset.id, asset.balance)">
+                {{ asset.balance }}
+              </button>
+              <input
+                v-else
+                v-model="editedValue"
+                type="number"
+                @keyup.enter="handleUpdateAsset(asset.id, asset.asset_type)"
+                @blur="cancelEditing"
+              />
+            </td>
+            <td>{{ asset.updated_at }}</td>
+            <td>
+              <button class="action-button" @click="handleDeleteAsset(asset.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
+      <span>{{ currentPage }} / {{ totalPages }} page</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+
+      <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
+      <button @click="goToPage">Jump to</button>
+
+      <label>
+        Per page：
+        <select v-model="itemsPerPage" @change="currentPage = 1">
+          <option :value="10">10</option>
+          <option :value="50">50</option>
+          <option :value="100">100</option>
+        </select>
+      </label>
+    </div>
 
     <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
       Create New Asset
@@ -70,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
 
 const assets = ref([])
@@ -83,6 +103,11 @@ const editedValue = ref('')
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
 const showForm = ref(false)
+
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+const jumpToPage = ref(1)
+const totalPages = computed(() => Math.ceil(assets.value.length / itemsPerPage.value))
 
 const fetchAssets = async () => {
   try {
@@ -106,7 +131,6 @@ const createAsset = async () => {
   try {
     const response = await addAsset(newAssetType.value, parseFloat(newBalance.value))
     if (response && response.data) {
-      // window.location.reload()
       assets.value.push(response.data)
       newAssetType.value = ''
       newBalance.value = ''
@@ -190,6 +214,30 @@ const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
+const paginatedAssets = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return assets.value.slice(start, end)
+})
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const goToPage = () => {
+  if (jumpToPage.value >= 1 && jumpToPage.value <= totalPages.value) {
+    currentPage.value = jumpToPage.value
+  }
+}
+
 onMounted(fetchAssets)
 </script>
 <style scoped>
@@ -208,6 +256,25 @@ table {
   background-color: #1e1e1e;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  table-layout: fixed;
+}
+
+.table-container thead {
+  top: 0;
+  background-color: #333;
+  z-index: 10;
 }
 
 label {
@@ -233,6 +300,11 @@ button {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
+.create-asset-button {
+  margin-top: 20px;
+}
+
 button:hover {
   background-color: #0056b3;
 }
@@ -311,5 +383,34 @@ td {
 
 .cancel-button:hover {
   background-color: #c9302c;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.pagination select,
+.pagination input {
+  padding: 5px;
+  font-size: 16px;
+  width: 60px;
 }
 </style>
