@@ -1,15 +1,5 @@
 <template>
   <div class="container">
-    <div class="asset-form">
-      <label for="asset_type">Asset Type:</label>
-      <input id="asset_type" v-model="newAssetType" placeholder="Enter asset type" />
-
-      <label for="balance">Balance:</label>
-      <input id="balance" v-model="newBalance" type="number" placeholder="Enter balance" />
-
-      <button @click="createAsset">Create Asset</button>
-    </div>
-
     <table>
       <thead>
         <tr>
@@ -38,7 +28,6 @@
               type="text"
               @keyup.enter="handleUpdateAssetType(asset.id, asset.balance)"
               @blur="cancelEditingType"
-              ref="typeInput"
             />
           </td>
           <td>
@@ -51,7 +40,6 @@
               type="number"
               @keyup.enter="handleUpdateAsset(asset.id, asset.asset_type)"
               @blur="cancelEditing"
-              ref="balanceInput"
             />
           </td>
           <td>{{ asset.updated_at }}</td>
@@ -61,6 +49,23 @@
         </tr>
       </tbody>
     </table>
+
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      Create New Asset
+    </button>
+
+    <div v-if="showForm" class="asset-form">
+      <label for="asset_type">Asset Type:</label>
+      <input id="asset_type" v-model="newAssetType" placeholder="Enter asset type" />
+
+      <label for="balance">Balance:</label>
+      <input id="balance" v-model="newBalance" type="number" placeholder="Enter balance" />
+
+      <div class="button-group">
+        <button @click="createAsset">Create Asset</button>
+        <button @click="showForm = false" class="cancel-button">Cancel</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -74,11 +79,10 @@ const newBalance = ref('')
 
 const editingId = ref(null)
 const editedValue = ref('')
-const balanceInput = ref(null)
 
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
-const typeInput = ref(null)
+const showForm = ref(false)
 
 const fetchAssets = async () => {
   try {
@@ -102,9 +106,11 @@ const createAsset = async () => {
   try {
     const response = await addAsset(newAssetType.value, parseFloat(newBalance.value))
     if (response && response.data) {
-      window.location.reload()
+      // window.location.reload()
+      assets.value.push(response.data)
       newAssetType.value = ''
       newBalance.value = ''
+      showForm.value = false
     } else {
       console.error('Invalid API response', response)
     }
@@ -131,7 +137,7 @@ const startEditing = async (assetId, balance) => {
 
 const handleUpdateAsset = async (asset_id, asset_type) => {
   if (editedValue.value === '') {
-    alert(`Please enter Balance! ${newBalance.value}`)
+    alert(`Please enter Balance! ${editedValue.value}`)
     return
   }
 
@@ -196,7 +202,7 @@ onMounted(fetchAssets)
 }
 
 table {
-  width: 80%;
+  width: 100%;
   border-collapse: collapse;
   margin: 20px auto;
   background-color: #1e1e1e;
@@ -233,19 +239,16 @@ button:hover {
 
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-th {
-  background-color: #333;
-  color: white;
+  border: 1px solid #444;
   padding: 10px;
 }
 
+th {
+  background-color: #333;
+  color: white;
+}
+
 td {
-  border: 1px solid #444;
-  padding: 10px;
   text-align: center;
 }
 
@@ -273,5 +276,40 @@ td {
   border-radius: 5px;
   background-color: #333;
   color: white;
+}
+
+.asset-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.cancel-button {
+  background-color: #d9534f;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #c9302c;
 }
 </style>

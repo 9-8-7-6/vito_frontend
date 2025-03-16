@@ -1,16 +1,14 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import NavBar from '@/views/NavBar.vue'
 
-const router = useRouter()
-const isAuthenticated = computed(() => !!localStorage.getItem('access_token'))
+const route = useRoute()
 </script>
 
 <template>
-  <header>
-    <NavBar />
-    <div class="wrapper" v-if="$route.path == '/'">
+  <NavBar />
+  <header v-if="route.path === '/'">
+    <div class="wrapper">
       <h1 class="custom-title">Vito</h1>
       <mark
         ><em
@@ -54,14 +52,10 @@ a:active {
   text-decoration: underline;
 }
 
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+nav {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
 }
 
 .custom-title {
@@ -69,27 +63,8 @@ header {
   color: bisque;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
+.wrapper {
   text-align: center;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
+  padding: 20px;
 }
 </style>
