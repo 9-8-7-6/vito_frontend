@@ -68,3 +68,23 @@ export const deleteAsset = async (asset_id: string) => {
     console.error('Failed to parse user data or send request:', error)
   }
 }
+
+export const updateAsset = async (asset_id: string, asset_type: string, balance: number) => {
+  try {
+    const url = `${API_BASE_URL}/${asset_id}`
+    const body = {
+      asset_type: asset_type,
+      balance: balance,
+    }
+
+    const response = await axios.put(url, body)
+
+    console.log(
+      `Sending PUT request to url ${url} for ${asset_id} asset, response: ${JSON.stringify(response, null, 2)}`,
+    )
+
+    return response
+  } catch (error) {
+    console.error('Failed to parse user data or send request:', error)
+  }
+}
