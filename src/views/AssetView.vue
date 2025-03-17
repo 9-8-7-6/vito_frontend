@@ -56,10 +56,8 @@
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
       <span>{{ currentPage }} / {{ totalPages }} page</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-
       <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
       <button @click="goToPage">Jump to</button>
-
       <label>
         Per page：
         <select v-model="itemsPerPage" @change="currentPage = 1">
@@ -77,10 +75,8 @@
     <div v-if="showForm" class="asset-form">
       <label for="asset_type">Asset Type:</label>
       <input id="asset_type" v-model="newAssetType" placeholder="Enter asset type" />
-
       <label for="balance">Balance:</label>
       <input id="balance" v-model="newBalance" type="number" placeholder="Enter balance" />
-
       <div class="button-group">
         <button @click="createAsset">Create Asset</button>
         <button @click="showForm = false" class="cancel-button">Cancel</button>

@@ -30,22 +30,43 @@ const handleLogin = async () => {
 }
 </script>
 
-<style>
+<style scoped>
 .container {
-  max-width: 300px;
-  margin: auto;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 input {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
+
 button {
-  width: 100%;
-  padding: 8px;
-  background-color: blue;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
   color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 </style>

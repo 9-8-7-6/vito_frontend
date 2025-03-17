@@ -28,7 +28,6 @@ import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
-
 const dropdownVisible = ref(false)
 
 const toggleDropdown = () => {
