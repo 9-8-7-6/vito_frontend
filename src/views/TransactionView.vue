@@ -1,6 +1,14 @@
 <template>
   <div class="container">
+
     <div class="table-container">
+      <div class="filter-transaction-type">
+        <button @click="filterType = 'All'">All</button>
+        <button @click="filterType = 'Income'">Income</button>
+        <button @click="filterType = 'Expense'">Expense</button>
+        <button @click="filterType = 'InternalTransfer'">Internal Transfer</button>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -10,6 +18,7 @@
             <th>Fee</th>
             <th>Transaction Time</th>
             <th>Notes</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -21,6 +30,11 @@
             <td>{{ transaction.fee }}</td>
             <td>{{ transaction.transaction_time }}</td>
             <td>{{ transaction.notes }}</td>
+            <td>
+              <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -180,6 +194,7 @@ import {
   addTransactionExpense,
   addTransactionInternalTransfer,
   getTransactionsByUserId,
+  deleteTransaction,
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
 
@@ -217,6 +232,8 @@ watch(itemsPerPage, (newVal) => {
 
 const jumpToPage = ref(1)
 const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
+
+const filterType = ref('All')
 
 const toggleTransaction = (type) => {
   showIncome.value = false
@@ -256,6 +273,11 @@ const fetchAssetType = async () => {
     console.error('Error fetching transactions:', error)
   }
 }
+
+watch(filterType, () => {
+  currentPage.value = 1
+  jumpToPage.value = 1
+})
 
 const createTransactionIncome = async () => {
   if (!newAmount.value || !newToAssetId.value) {
@@ -378,7 +400,14 @@ const createTransactionInternalTransfer = async () => {
   }
 }
 
-const handleDeleteTransaction = async (transaction_id) => {}
+const handleDeleteTransaction = async (transaction_id) => {
+  try {
+    const response = await deleteTransaction(transaction_id)
+    window.location.reload()
+  } catch (error) {
+    console.error('Error deleting assets:', error)
+  }
+}
 
 const startEditing = async (transactionId, amount) => {
   editingId.value = transactionId
@@ -406,10 +435,20 @@ const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
+const filteredTransactions = computed(() => {
+  if (filterType.value === 'All') {
+    return transactions.value
+  } else {
+    return transactions.value.filter(
+      (t) => t.transaction_type === filterType.value
+    )
+  }
+})
+
 const paginatedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
-  return transactions.value.slice(start, end)
+  return filteredTransactions.value.slice(start, end)
 })
 
 const prevPage = () => {
@@ -527,14 +566,14 @@ td {
 }
 
 .action-button {
-  background-color: #2730ac;
+  background-color: #d9534f;
   color: white;
   padding: 5px 10px;
   border-radius: 4px;
 }
 
 .action-button:hover {
-  background-color: #323dd0;
+  background-color: #c9302c;
 }
 
 .transaction-type-button,
@@ -678,4 +717,27 @@ td {
 .cancel-button:hover {
   background-color: #c9302c;
 }
+
+.filter-transaction-type {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;          
+  margin-bottom: 20px;
+}
+
+.filter-transaction-type button {
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-transaction-type button:hover {
+  background-color: #444;
+}
+
 </style>
