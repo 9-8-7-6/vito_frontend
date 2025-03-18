@@ -6,6 +6,7 @@ import Register from '../views/RegisterView.vue'
 import Asset from '../views/AssetView.vue'
 import Transaction from '../views/TransactionView.vue'
 import { useAuthStore } from '@/stores/auth'
+import { removeCookie } from 'typescript-cookie'
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
@@ -34,6 +35,7 @@ router.beforeEach(async (to, from, next) => {
   if (!isAuthenticated) {
     authStore.user = null
     localStorage.removeItem('user')
+    removeCookie('id', { path: '/' })
   }
 
   if (to.meta.requiresAuth && !isAuthenticated) {

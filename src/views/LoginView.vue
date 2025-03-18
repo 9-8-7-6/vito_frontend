@@ -1,8 +1,14 @@
 <template>
   <div class="container">
     <form @submit.prevent="handleLogin">
-      <input v-model="username" type="username" placeholder="Username" required />
-      <input v-model="password" type="password" placeholder="Password" required />
+      <div class="form-group">
+        <label for="username" class="label">Username</label>
+        <input v-model="username" type="username" placeholder="Username" required />
+      </div>
+      <div class="form-group">
+        <label for="username" class="label">password</label>
+        <input v-model="password" type="password" placeholder="Password" required />
+      </div>
       <button type="submit">Login</button>
     </form>
   </div>
@@ -48,6 +54,11 @@ form {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
 input {
   padding: 10px;
   border: 1px solid #ccc;
@@ -68,5 +79,12 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
 }
 </style>
