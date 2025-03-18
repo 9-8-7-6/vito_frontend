@@ -5,53 +5,22 @@
         <thead>
           <tr>
             <th>Number</th>
-            <th>Transaction type</th>
+            <th>Transaction Type</th>
             <th>Amount</th>
-            <th>Last time updated</th>
-            <th>Detail</th>
+            <th>Fee</th>
+            <th>Transaction Time</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
             <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
-            <td>
-              <button
-                v-if="editingTypeId !== transaction.id"
-                class="transaction-type-button"
-                @click="startEditingType(transaction.id, transaction.transaction_type)"
-              >
-                {{ transaction.transaction_type }}
-              </button>
-              <input
-                v-else
-                class="transaction-type-input"
-                v-model="editedTypeValue"
-                type="text"
-                @keyup.enter="handleUpdateTransactionType(transaction.id, transaction.amount)"
-                @blur="cancelEditingType"
-              />
-            </td>
-            <td>
-              <button
-                v-if="editingId !== transaction.id"
-                @click="startEditing(transaction.id, transaction.amount)"
-              >
-                {{ transaction.amount }}
-              </button>
-              <input
-                v-else
-                v-model="editedValue"
-                type="number"
-                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.transaction_type)"
-                @blur="cancelEditing"
-              />
-            </td>
-            <td>{{ transaction.updated_at }}</td>
-            <td>
-              <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
-                Detail
-              </button>
-            </td>
+
+            <td>{{ transaction.transaction_type }}</td>
+            <td>{{ transaction.amount }}</td>
+            <td>{{ transaction.fee }}</td>
+            <td>{{ transaction.transaction_time }}</td>
+            <td>{{ transaction.notes }}</td>
           </tr>
         </tbody>
       </table>
@@ -200,6 +169,7 @@ import {
   addTransactionIncome,
   addTransactionExpense,
   addTransactionInternalTransfer,
+  getTransactionsByUserId,
 } from '../api/transaction'
 
 const showForm = ref(false)
@@ -242,7 +212,18 @@ const toggleTransaction = (type) => {
   if (type === 'internalTransfer') showInternalTransfer.value = true
 }
 
-const fetchTransactions = async () => {}
+const fetchTransactions = async () => {
+  try {
+    const response = await getTransactionsByUserId()
+    if (response && response.data) {
+      transactions.value = response.data
+    } else {
+      console.error('Invalid API response', response)
+    }
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
+  }
+}
 
 const createTransactionIncome = async () => {
   if (!newAmount.value || !newToAssetId.value) {

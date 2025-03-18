@@ -13,7 +13,7 @@ export const getTransactionsByUserId = async () => {
 
   try {
     const parsedUser: { id: string } = JSON.parse(userData)
-    const url = `${API_BASE_URL}/${parsedUser.id}`
+    const url = `${API_BASE_URL}/account/${parsedUser.id}`
     const response = await axios.get(url)
 
     console.log(
