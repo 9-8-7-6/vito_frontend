@@ -66,8 +66,13 @@
         </div>
 
         <div class="form-group">
-          <label for="asset_id">Asset ID</label>
-          <input v-model="newToAssetId" id="asset_id" type="text" placeholder="Enter asset ID" />
+          <label for="asset_id">To Asset</label>
+          <select v-model="newToAssetId" id="asset_id">
+            <option disabled value="">-- Select Asset --</option>
+            <option v-for="asset in assets" :key="asset.id" :value="asset.id">
+              {{ asset.asset_type }}
+            </option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -92,8 +97,13 @@
         </div>
 
         <div class="form-group">
-          <label for="asset_id">Asset ID</label>
-          <input v-model="newFromAssetId" id="asset_id" type="text" placeholder="Enter asset ID" />
+          <label for="asset_id">From Asset</label>
+          <select v-model="newFromAssetId" id="asset_id">
+            <option disabled value="">-- Select Asset --</option>
+            <option v-for="asset in assets" :key="asset.id" :value="asset.id">
+              {{ asset.asset_type }}
+            </option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -111,36 +121,36 @@
       </div>
 
       <div v-if="showInternalTransfer" class="create-transaction-form-wrapper">
-        <h2>New Internal Transfer</h2>
+        <h2>New Internal Transfer Transaction</h2>
 
         <div class="form-group">
-          <label for="fromAssetId">From Asset ID</label>
-          <input
-            v-model="newFromAssetId"
-            id="fromAssetId"
-            type="text"
-            placeholder="Enter from asset ID"
-          />
+          <label for="fromAssetId">From Asset</label>
+          <select v-model="newFromAssetId" id="fromAssetId">
+            <option disabled value="">-- Select Asset --</option>
+            <option v-for="asset in assets" :key="asset.id" :value="asset.id">
+              {{ asset.asset_type }}
+            </option>
+          </select>
         </div>
 
         <div class="form-group">
-          <label for="toAssetId">To Asset ID</label>
-          <input
-            v-model="newToAssetId"
-            id="toAssetId"
-            type="text"
-            placeholder="Enter to asset ID"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="fee">Fee</label>
-          <input v-model="newFee" id="fee" type="number" placeholder="Enter fee" />
+          <label for="toAssetId">To Asset</label>
+          <select v-model="newToAssetId" id="toAssetId">
+            <option disabled value="">-- Select Asset --</option>
+            <option v-for="asset in assets" :key="asset.id" :value="asset.id">
+              {{ asset.asset_type }}
+            </option>
+          </select>
         </div>
 
         <div class="form-group">
           <label for="amount">Amount</label>
           <input v-model="newAmount" id="amount" type="number" placeholder="Enter amount" />
+        </div>
+
+        <div class="form-group">
+          <label for="fee">Fee</label>
+          <input v-model="newFee" id="fee" type="number" placeholder="Enter fee" />
         </div>
 
         <div class="form-group">
@@ -164,13 +174,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import {
   addTransactionIncome,
   addTransactionExpense,
   addTransactionInternalTransfer,
   getTransactionsByUserId,
 } from '../api/transaction'
+import { getAsset } from '../api/asset'
 
 const showForm = ref(false)
 const showIncome = ref(false)
@@ -187,6 +198,7 @@ const newToAssetId = ref('')
 const newFee = ref('')
 
 const transactions = ref([])
+const assets = ref([])
 
 const editingId = ref(null)
 const editedValue = ref('')
@@ -195,7 +207,14 @@ const editingTypeId = ref(null)
 const editedTypeValue = ref('')
 
 const currentPage = ref(1)
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(
+  localStorage.getItem('itemsPerPage') ? parseInt(localStorage.getItem('itemsPerPage'), 10) : 10,
+)
+
+watch(itemsPerPage, (newVal) => {
+  localStorage.setItem('itemsPerPage', newVal)
+})
+
 const jumpToPage = ref(1)
 const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
 
@@ -217,6 +236,19 @@ const fetchTransactions = async () => {
     const response = await getTransactionsByUserId()
     if (response && response.data) {
       transactions.value = response.data
+    } else {
+      console.error('Invalid API response', response)
+    }
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
+  }
+}
+
+const fetchAssetType = async () => {
+  try {
+    const response = await getAsset()
+    if (response && response.data) {
+      assets.value = response.data
     } else {
       console.error('Invalid API response', response)
     }
@@ -253,6 +285,7 @@ const createTransactionIncome = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      window.location.reload()
     } else {
       console.error('Invalid API response', response)
       alert('Failed to add transaction. Please try again.')
@@ -291,6 +324,7 @@ const createTransactionExpense = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      window.location.reload()
     } else {
       console.error('Invalid API response', response)
       alert('Failed to add transaction. Please try again.')
@@ -333,6 +367,7 @@ const createTransactionInternalTransfer = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      window.location.reload()
     } else {
       console.error('Invalid API response', response)
       alert('Failed to add transaction. Please try again.')
@@ -395,7 +430,10 @@ const goToPage = () => {
   }
 }
 
-onMounted(fetchTransactions)
+onMounted(async () => {
+  await fetchTransactions()
+  await fetchAssetType()
+})
 </script>
 <style scoped>
 .container {
@@ -438,7 +476,8 @@ label {
   font-size: 16px;
   margin-bottom: 5px;
 }
-input {
+input,
+select {
   width: 250px;
   padding: 10px;
   margin-bottom: 10px;
@@ -447,6 +486,12 @@ input {
   background-color: #333;
   color: white;
 }
+
+option {
+  background-color: #2e2e2e;
+  color: #ccc;
+}
+
 button {
   padding: 10px 20px;
   border: none;
