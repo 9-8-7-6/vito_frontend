@@ -218,13 +218,30 @@ export const deleteTransaction = async (transaction_id: string) => {
 export const updateTransaction = async (
   transaction_id: string,
   transaction_type: string,
-  balance: number,
+  from_asset_id: string,
+  to_asset_id: string,
+  amount: number,
+  fee: number,
+  from_account_id: string,
+  to_account_id: string,
+  transaction_time: string,
+  notes: string,
+  image: string,
 ) => {
   try {
     const url = `${API_BASE_URL}/${transaction_id}`
+
     const body = {
+      from_asset_id: from_asset_id,
+      to_asset_id: to_asset_id,
       transaction_type: transaction_type,
-      balance: balance,
+      amount: amount,
+      fee: fee,
+      from_account_id: from_account_id,
+      to_account_id: to_account_id,
+      transaction_time: transaction_time,
+      notes: notes,
+      image: image,
     }
 
     const response = await axios.put(url, body)

@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-
     <div class="table-container">
       <div class="filter-transaction-type">
         <button @click="filterType = 'All'">All</button>
@@ -25,9 +24,55 @@
           <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
             <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
 
-            <td>{{ transaction.transaction_type }}</td>
-            <td>{{ transaction.amount }}</td>
-            <td>{{ transaction.fee }}</td>
+            <td>
+              <button
+                v-if="editingTypeId !== transaction.id"
+                class="transaction-type-button"
+                @click="startEditingType(transaction.id, transaction.transaction_type)"
+              >
+                {{ transaction.transaction_type }}
+              </button>
+              <input
+                v-else
+                class="transaction-type-input"
+                v-model="editedTypeValue"
+                type="text"
+                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.balance)"
+                @blur="cancelEditingType"
+              />
+            </td>
+
+            <td>
+              <button
+                v-if="editingId !== transaction.id"
+                @click="startEditing(transaction.id, transaction.balance)"
+              >
+                {{ transaction.amount }}
+              </button>
+              <input
+                v-else
+                v-model="editedValue"
+                type="number"
+                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.transaction_type)"
+                @blur="cancelEditing"
+              />
+            </td>
+
+            <td>
+              <button
+                v-if="editingId !== transaction.id"
+                @click="startEditing(transaction.id, transaction.fee)"
+              >
+                {{ transaction.fee }}
+              </button>
+              <input
+                v-else
+                v-model="editedValue"
+                type="number"
+                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.transaction_type)"
+                @blur="cancelEditing"
+              />
+            </td>
             <td>{{ transaction.transaction_time }}</td>
             <td>{{ transaction.notes }}</td>
             <td>
@@ -195,6 +240,7 @@ import {
   addTransactionInternalTransfer,
   getTransactionsByUserId,
   deleteTransaction,
+  updateTransaction,
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
 
@@ -416,7 +462,39 @@ const startEditing = async (transactionId, amount) => {
   await nextTick()
 }
 
-const handleUpdateTransaction = async (transaction_id, transaction_type) => {}
+const handleUpdateTransaction = async (
+  transaction_id,
+  transaction_type,
+  from_asset_id,
+  to_asset_id,
+  amount,
+  fee,
+  from_account_id,
+  to_account_id,
+  transaction_time,
+  notes,
+  image,
+) => {
+  try {
+    const response = await updateTransaction(
+      transaction_id,
+      transaction_type,
+      from_asset_id,
+      to_asset_id,
+      amount,
+      fee,
+      from_account_id,
+      to_account_id,
+      transaction_time,
+      notes,
+      image,
+    )
+
+    window.location.reload()
+  } catch (error) {
+    console.error('Error deleting assets:', error)
+  }
+}
 
 const cancelEditing = () => {
   editingId.value = null
@@ -439,9 +517,7 @@ const filteredTransactions = computed(() => {
   if (filterType.value === 'All') {
     return transactions.value
   } else {
-    return transactions.value.filter(
-      (t) => t.transaction_type === filterType.value
-    )
+    return transactions.value.filter((t) => t.transaction_type === filterType.value)
   }
 })
 
@@ -722,7 +798,7 @@ td {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;          
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -739,5 +815,4 @@ td {
 .filter-transaction-type button:hover {
   background-color: #444;
 }
-
 </style>
