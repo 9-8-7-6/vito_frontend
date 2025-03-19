@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/assets`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/assets`
 
 export const getAsset = async () => {
   const userData = localStorage.getItem('user')
