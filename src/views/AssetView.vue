@@ -162,7 +162,9 @@ const handleUpdateAsset = async (asset_id, asset_type) => {
   }
 
   try {
-    const response = await updateAsset(asset_id, asset_type, parseFloat(editedValue.value))
+    const updatedFields = {}
+    updatedFields.balance = parseFloat(editedValue.value)
+    const response = await updateAsset(asset_id, updatedFields)
     if (response) {
       window.location.reload()
     } else {
@@ -193,7 +195,9 @@ const handleUpdateAssetType = async (asset_id, balance) => {
   }
 
   try {
-    const response = await updateAsset(asset_id, editedTypeValue.value, balance)
+    const updatedFields = {}
+    updatedFields.asset_type = editedTypeValue.value
+    const response = await updateAsset(asset_id, updatedFields)
     if (response) {
       window.location.reload()
     } else {

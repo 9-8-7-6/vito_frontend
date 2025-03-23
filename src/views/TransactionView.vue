@@ -37,7 +37,9 @@
                 class="transaction-type-input"
                 v-model="editedTypeValue"
                 type="text"
-                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.balance)"
+                @keyup.enter="
+                  updateTransactionField(transaction.id, 'transaction_type', editedTypeValue)
+                "
                 @blur="cancelEditingType"
               />
             </td>
@@ -45,15 +47,17 @@
             <td>
               <button
                 v-if="editingId !== transaction.id"
-                @click="startEditing(transaction.id, transaction.balance)"
+                @click="startEditing(transaction.id, transaction.amount, 'amount')"
               >
                 {{ transaction.amount }}
               </button>
               <input
-                v-else
+                v-else-if="editingField === 'amount'"
                 v-model="editedValue"
                 type="number"
-                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.transaction_type)"
+                @keyup.enter="
+                  updateTransactionField(transaction.id, 'amount', parseFloat(editedValue))
+                "
                 @blur="cancelEditing"
               />
             </td>
@@ -61,18 +65,21 @@
             <td>
               <button
                 v-if="editingId !== transaction.id"
-                @click="startEditing(transaction.id, transaction.fee)"
+                @click="startEditing(transaction.id, transaction.fee, 'fee')"
               >
                 {{ transaction.fee }}
               </button>
               <input
-                v-else
+                v-else-if="editingField === 'fee'"
                 v-model="editedValue"
                 type="number"
-                @keyup.enter="handleUpdateTransaction(transaction.id, transaction.transaction_type)"
+                @keyup.enter="
+                  updateTransactionField(transaction.id, 'fee', parseFloat(editedValue))
+                "
                 @blur="cancelEditing"
               />
             </td>
+
             <td>{{ transaction.transaction_time }}</td>
             <td>{{ transaction.notes }}</td>
             <td>
@@ -263,6 +270,7 @@ const assets = ref([])
 
 const editingId = ref(null)
 const editedValue = ref('')
+const editingField = ref('')
 
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
@@ -455,49 +463,12 @@ const handleDeleteTransaction = async (transaction_id) => {
   }
 }
 
-const startEditing = async (transactionId, amount) => {
+const startEditing = async (transactionId, value, field) => {
   editingId.value = transactionId
-  editedValue.value = amount
+  editingField.value = field
+  editedValue.value = value
 
   await nextTick()
-}
-
-const handleUpdateTransaction = async (
-  transaction_id,
-  transaction_type,
-  from_asset_id,
-  to_asset_id,
-  amount,
-  fee,
-  from_account_id,
-  to_account_id,
-  transaction_time,
-  notes,
-  image,
-) => {
-  try {
-    const response = await updateTransaction(
-      transaction_id,
-      transaction_type,
-      from_asset_id,
-      to_asset_id,
-      amount,
-      fee,
-      from_account_id,
-      to_account_id,
-      transaction_time,
-      notes,
-      image,
-    )
-
-    window.location.reload()
-  } catch (error) {
-    console.error('Error deleting assets:', error)
-  }
-}
-
-const cancelEditing = () => {
-  editingId.value = null
 }
 
 const startEditingType = async (transactionId, transactionType) => {
@@ -507,10 +478,39 @@ const startEditingType = async (transactionId, transactionType) => {
   await nextTick()
 }
 
-const handleUpdateTransactionType = async (transaction_id, amount) => {}
+const updateTransactionField = async (transaction_id, field, value) => {
+  try {
+    const updatedFields = { [field]: value }
+    const response = await updateTransaction(transaction_id, updatedFields)
+    await fetchTransactions()
+    cancelEditing()
+    cancelEditingType()
+  } catch (error) {
+    console.error(`Failed to update ${field}:`, error)
+  }
+}
+
+const handleUpdateTransaction = async (transaction_id, field, value) => {
+  try {
+    const updatedFields = {}
+
+    const response = await updateTransaction(transaction_id, updatedFields)
+
+    window.location.reload()
+  } catch (error) {
+    console.error('Error deleting assets:', error)
+  }
+}
+
+const cancelEditing = () => {
+  editingId.value = null
+  editingField.value = ''
+  editedValue.value = ''
+}
 
 const cancelEditingType = () => {
   editingTypeId.value = null
+  editedTypeValue.value = ''
 }
 
 const filteredTransactions = computed(() => {

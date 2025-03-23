@@ -69,18 +69,14 @@ export const deleteAsset = async (asset_id: string) => {
   }
 }
 
-export const updateAsset = async (asset_id: string, asset_type: string, balance: number) => {
+export const updateAsset = async (asset_id: string, fieldsToUpdate: Record<string, any>) => {
   try {
     const url = `${API_BASE_URL}/${asset_id}`
-    const body = {
-      asset_type: asset_type,
-      balance: balance,
-    }
 
-    const response = await axios.put(url, body)
+    const response = await axios.patch(url, fieldsToUpdate)
 
     console.log(
-      `Sending PUT request to url ${url} for ${asset_id} asset, response: ${JSON.stringify(response, null, 2)}`,
+      `Sending PATCH request to url ${url} for ${asset_id} asset, response: ${JSON.stringify(response, null, 2)}`,
     )
 
     return response
