@@ -16,6 +16,7 @@
         >
         <router-link v-if="!authStore.user" to="/login" class="dropdown-item">Login</router-link>
         <button v-if="authStore.user" @click="handleLogout" class="dropdown-item">Logout</button>
+        <router-link v-if="authStore.user" to="/setting" class="dropdown-item">Setting</router-link>
       </div>
     </div>
   </nav>

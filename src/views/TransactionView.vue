@@ -12,6 +12,7 @@
         <thead>
           <tr>
             <th>Number</th>
+            <th>Asset</th>
             <th>Transaction Type</th>
             <th>Amount</th>
             <th>Fee</th>
@@ -23,6 +24,18 @@
         <tbody>
           <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
             <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
+
+            <td>
+              <span v-if="transaction.from_asset_type && transaction.to_asset_type">
+                {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
+              </span>
+              <span v-else-if="transaction.from_asset_type">
+                {{ transaction.from_asset_type }}
+              </span>
+              <span v-else-if="transaction.to_asset_type">
+                {{ transaction.to_asset_type }}
+              </span>
+            </td>
 
             <td>
               <button
