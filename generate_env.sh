@@ -1,15 +1,16 @@
 #!/bin/bash
 
-SERVER_IP=$(hostname -I | awk '{print $1}')
+TARGET_FILE=".env"
 
-if [[ -z "$SERVER_IP" ]]; then
-    echo "Can't get IP，Please check the internet setting"
-    exit 1
+if [ -f "$TARGET_FILE" ]; then
+    cp "$TARGET_FILE" "$TARGET_FILE.bak"
+    echo "🔁 Existing $TARGET_FILE backed up as $TARGET_FILE.bak"
 fi
 
-ENV_FILE=".env"
+echo "🌐 Generating $TARGET_FILE for Vite..."
 
-echo "VITE_API_BASE_URL=http://$SERVER_IP" > $ENV_FILE
+cat > "$TARGET_FILE" <<EOF
+VITE_API_BASE_URL=http://localhost:8000
+EOF
 
-echo ".env is generated already, the content is："
-cat $ENV_FILE
+echo "✅ $TARGET_FILE created with VITE_API_BASE_URL"
