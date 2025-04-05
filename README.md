@@ -1,61 +1,25 @@
-# vito_frontend
+# Vito Frontend - Bookkeeping UI (Vue 3 + Vite)
 
-This template should help get you started developing with Vue 3 in Vite.
+**Vito Frontend** is the **user interface** for the **Vito bookkeeping system**, built using **Vue 3** and **Vite**.
 
-## Recommended IDE Setup
+It connects to the [Rust-based backend](https://github.com/9-8-7-6/vito.git) and provides a responsive, modern UI for managing accounts, transactions, and balances.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+---
 
-## Type Support for `.vue` Imports in TS
+## Features
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **Vue 3 Composition API**: Clean and modern frontend architecture  
+- **Vite Dev Server**: Fast development and hot module replacement  
+- **Docker support**: Run in seconds with `docker-compose`  
+- **Environment variables**: Easily configurable via `.env`  
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
+## Getting Started
 
 ```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Run End-to-End Tests with [Nightwatch](https://nightwatchjs.org/)
-
-```sh
-# When using CI, the project must be built first.
-npm run build
-
-# Runs the end-to-end tests
-npm run test:e2e
-# Runs the tests only on Chrome
-npm run test:e2e -- --env chrome
-# Runs the tests of a specific file
-npm run test:e2e -- tests/e2e/example.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
-```
-    
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+git clone https://github.com/9-8-7-6/vito_frontend.git
+cd vito_frontend
+chmod +x ./generate_env.sh
+./generate_env.sh
+docker compose up -d
