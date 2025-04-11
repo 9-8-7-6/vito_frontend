@@ -4,6 +4,7 @@ import Home from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
 import Asset from '../views/AssetView.vue'
+import Stock from '../views/StockView.vue'
 import Setting from '../views/SettingVuew.vue'
 import Transaction from '../views/TransactionView.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -15,6 +16,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/asset', name: 'Asset', component: Asset, meta: { requiresAuth: true } },
   { path: '/setting', name: 'Setting', component: Setting, meta: { requiresAuth: true } },
+  { path: '/stock', name: 'Stock', component: Stock, meta: { requiresAuth: true } },
   {
     path: '/transaction',
     name: 'Transaction',

@@ -6,6 +6,7 @@
       <router-link v-if="authStore.user" to="/transaction" class="nav-link"
         >Transaction</router-link
       >
+      <router-link v-if="authStore.user" to="/stock" class="nav-link">Stock</router-link>
     </div>
 
     <div class="nav-menu">
