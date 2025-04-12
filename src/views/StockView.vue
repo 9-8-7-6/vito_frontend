@@ -26,13 +26,27 @@
                 @keyup.enter="handleUpdateHolding(item.id)"
                 @blur="cancelEditing"
               />
-              <button
+              <span
                 v-else
                 class="editable-button"
+                :class="{
+                  profit:
+                    item.current_price &&
+                    item.quantity * item.current_price - item.quantity * item.average_price >= 0,
+                  loss:
+                    item.current_price &&
+                    item.quantity * item.current_price - item.quantity * item.average_price < 0,
+                }"
                 @click="startEditingPrice(item.id, item.average_price)"
               >
-                {{ Number(item.average_price).toFixed(2) }}
-              </button>
+                {{
+                  item.current_price
+                    ? item.quantity * item.current_price - item.quantity * item.average_price >= 0
+                      ? '+' + Number(item.average_price).toFixed(2)
+                      : '-' + Number(item.average_price).toFixed(2)
+                    : Number(item.average_price).toFixed(2)
+                }}
+              </span>
             </td>
 
             <td>{{ item.current_price ?? 'N/A' }}</td>
@@ -45,13 +59,13 @@
                 @keyup.enter="handleUpdateHolding(item.id)"
                 @blur="cancelEditing"
               />
-              <button
+              <span
                 v-else
                 class="editable-button"
                 @click="startEditingQuantity(item.id, item.quantity)"
               >
                 {{ Number(item.quantity).toFixed(0) }}
-              </button>
+              </span>
             </td>
 
             <td>{{ (item.quantity * item.average_price).toFixed(2) }}</td>

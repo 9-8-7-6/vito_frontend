@@ -62,12 +62,12 @@
             </td>
 
             <td>
-              <button
+              <span
                 v-if="editingId !== transaction.id"
                 @click="startEditing(transaction.id, transaction.fee, 'fee')"
               >
                 {{ transaction.fee }}
-              </button>
+              </span>
               <input
                 v-else-if="editingField === 'fee'"
                 v-model="editedValue"

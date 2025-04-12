@@ -4,7 +4,6 @@
       <table>
         <thead>
           <tr>
-            <th>Number</th>
             <th>Asset Type</th>
             <th>Balance</th>
             <th>Last time updated</th>
@@ -13,15 +12,14 @@
         </thead>
         <tbody>
           <tr v-for="(asset, index) in paginatedAssets" :key="asset.id">
-            <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
             <td>
-              <button
+              <span
                 v-if="editingTypeId !== asset.id"
                 class="asset-type-button"
                 @click="startEditingType(asset.id, asset.asset_type)"
               >
                 {{ asset.asset_type }}
-              </button>
+              </span>
               <input
                 v-else
                 class="asset-type-input"
@@ -32,16 +30,24 @@
               />
             </td>
             <td>
-              <button v-if="editingId !== asset.id" @click="startEditing(asset.id, asset.balance)">
-                {{ asset.balance }}
-              </button>
               <input
-                v-else
+                v-if="editingId === asset.id"
                 v-model="editedValue"
                 type="number"
                 @keyup.enter="handleUpdateAsset(asset.id, asset.asset_type)"
                 @blur="cancelEditing"
               />
+              <span
+                v-else
+                :class="{
+                  profit: asset.balance > 0,
+                  loss: asset.balance < 0,
+                  neutral: asset.balance == 0,
+                }"
+                @click="startEditing(asset.id, asset.balance)"
+              >
+                {{ asset.balance > 0 ? '+' + asset.balance : asset.balance }}
+              </span>
             </td>
             <td>{{ asset.updated_at }}</td>
             <td>
@@ -383,6 +389,20 @@ td {
 
 .cancel-button:hover {
   background-color: #c9302c;
+}
+
+.profit {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.loss {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.neutral {
+  color: white;
 }
 
 .pagination {
