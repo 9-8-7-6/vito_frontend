@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holdings`
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holding`
 
 const getUserId = (): string | null => {
   const user = localStorage.getItem('user')
@@ -31,12 +31,14 @@ export const createStockHolding = async (
   tickerSymbol: string,
   quantity: number,
   averagePrice: number,
+  country: string,
 ) => {
   const accountId = getUserId()
   if (!accountId) return
 
   const payload = {
     account_id: accountId,
+    country,
     ticker_symbol: tickerSymbol,
     quantity,
     average_price: averagePrice,

@@ -4,36 +4,52 @@
       <table>
         <thead>
           <tr>
-            <th>Number</th>
-            <th>Ticker Symbol</th>
-            <th>Quantity</th>
+            <th>Stock</th>
             <th>Average Price</th>
             <th>Current Price</th>
+            <th>Quantity</th>
             <th>Total Cost</th>
             <th>Current Value</th>
+            <th>Profit / Loss</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in paginatedStockHoldings" :key="item.id">
-            <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
-
-            <td>{{ item.ticker_symbol }}</td>
-
-            <td>
-              <input v-if="editingId === item.id" v-model="editedQuantity" type="number" />
-              <span v-else>{{ item.quantity }}</span>
-            </td>
+            <td>{{ `${item.ticker_symbol} (${item.company_name})` }}</td>
 
             <td>
               <input v-if="editingId === item.id" v-model="editedAveragePrice" type="number" />
-              <span v-else>{{ item.average_price }}</span>
+              <span v-else>{{ Number(item.average_price).toFixed(2) }}</span>
             </td>
 
             <td>{{ item.current_price ?? 'N/A' }}</td>
+
+            <td>
+              <input v-if="editingId === item.id" v-model="editedQuantity" type="number" />
+              <span v-else>{{ Number(item.quantity).toFixed(0) }}</span>
+            </td>
+
             <td>{{ (item.quantity * item.average_price).toFixed(2) }}</td>
             <td>
               {{ item.current_price ? (item.quantity * item.current_price).toFixed(2) : 'N/A' }}
+            </td>
+
+            <td>
+              {{
+                item.current_price
+                  ? item.quantity * item.current_price - item.quantity * item.average_price >= 0
+                    ? '+' +
+                      (
+                        item.quantity * item.current_price -
+                        item.quantity * item.average_price
+                      ).toFixed(2)
+                    : (
+                        item.quantity * item.current_price -
+                        item.quantity * item.average_price
+                      ).toFixed(2)
+                  : 'N/A'
+              }}
             </td>
 
             <td>
@@ -74,11 +90,14 @@
     </button>
 
     <div v-if="showForm" class="asset-form">
+      <label for="country">Country:</label>
+      <select id="country" v-model="newCountry">
+        <option disabled value="" hidden>Select Country</option>
+        <option value="TW">Taiwan</option>
+      </select>
+
       <label for="ticker_symbol">Ticker Symbol:</label>
       <input id="ticker_symbol" v-model="newTickerSymbol" placeholder="e.g., AAPL" />
-
-      <label for="quantity">Quantity:</label>
-      <input id="quantity" v-model="newQuantity" type="number" placeholder="Enter quantity" />
 
       <label for="average_price">Average Price:</label>
       <input
@@ -87,6 +106,9 @@
         type="number"
         placeholder="Enter avg price"
       />
+
+      <label for="quantity">Quantity:</label>
+      <input id="quantity" v-model="newQuantity" type="number" placeholder="Enter quantity" />
 
       <div class="button-group">
         <button @click="createHolding">Create</button>
@@ -113,6 +135,7 @@ const editingId = ref(null)
 const editedQuantity = ref('')
 const editedAveragePrice = ref('')
 const showForm = ref(false)
+const newCountry = ref('')
 
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
@@ -140,7 +163,12 @@ const fetchHoldings = async () => {
 }
 
 const createHolding = async () => {
-  if (!newTickerSymbol.value || newQuantity.value === '' || newAveragePrice.value === '') {
+  if (
+    !newTickerSymbol.value ||
+    newQuantity.value === '' ||
+    newAveragePrice.value === '' ||
+    newCountry.value === ''
+  ) {
     alert(`Please enter Ticker Symbol, Quantity, and Average Price!`)
     return
   }
@@ -150,12 +178,14 @@ const createHolding = async () => {
       newTickerSymbol.value,
       parseFloat(newQuantity.value),
       parseFloat(newAveragePrice.value),
+      newCountry.value,
     )
     if (response && response.data) {
       await fetchHoldings()
       newTickerSymbol.value = ''
       newQuantity.value = ''
       newAveragePrice.value = ''
+      newCountry.value = ''
       showForm.value = false
     } else {
       console.error('Invalid API response', response)
@@ -268,6 +298,8 @@ label {
   font-size: 16px;
   margin-bottom: 5px;
 }
+
+select,
 input {
   width: 250px;
   padding: 10px;
@@ -277,6 +309,7 @@ input {
   background-color: #333;
   color: white;
 }
+
 button {
   padding: 10px 20px;
   border: none;
