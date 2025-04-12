@@ -20,11 +20,10 @@ export const registerUser = async (userData: RegisterData) => {
   try {
     return axios.post(url, userData)
   } catch (error) {
-    let errorMessage = 'Failed to do something exceptional'
-    if (error instanceof Error) {
-      errorMessage = error.message
-    }
-    console.log(errorMessage)
+    const errMessage =
+      error.response?.data?.message || error.message || 'Unknown Error during registration'
+    console.error('Register failed:', errMessage)
+    throw new Error(errMessage)
   }
 }
 
@@ -34,18 +33,17 @@ export const loginUser = async (credentials: Credentials) => {
   try {
     const response = await axios.post(url, credentials, { withCredentials: true })
     console.log(`Response of login request is`, response)
-    if (response.data && response.data.token) {
-      console.log('Login successful, setting cookie')
-      setCookie('id', response.data.token, { path: '/' })
+
+    if (response.data.status !== 'success') {
+      throw new Error(response.data.message || 'Login failed on server')
     }
+
     return response
   } catch (error) {
-    let errorMessage = 'Failed to do something exceptional'
-    if (error instanceof Error) {
-      errorMessage = error.message
-    }
-    console.log(errorMessage)
-    return null
+    const errMessage =
+      error.response?.data?.message || error.message || 'Unknown Error during login'
+    console.error('Login failed:', errMessage)
+    throw new Error(errMessage)
   }
 }
 

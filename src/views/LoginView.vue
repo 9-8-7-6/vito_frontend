@@ -25,13 +25,13 @@ const username = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-  const success = await authStore.login({ username: username.value, password: password.value })
-  if (success) {
-    console.log('login successfully')
+  try {
+    await authStore.login({ username: username.value, password: password.value })
     router.push('/')
-  } else {
+  } catch (error) {
     console.error('Login failed:', error)
-    alert('Login failed. Please check your username and password.')
+    const errorMessage = error.message || 'Unknown Error'
+    alert(`Login failed. Please check your credentials.\nError: ${errorMessage}`)
   }
 }
 </script>

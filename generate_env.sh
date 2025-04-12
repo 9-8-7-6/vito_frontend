@@ -13,4 +13,4 @@ cat > "$TARGET_FILE" <<EOF
 VITE_API_BASE_URL=http://localhost:8000
 EOF
 
-echo "✅ $TARGET_FILE created with VITE_API_BASE_URL"
+echo "$TARGET_FILE created with VITE_API_BASE_URL"
