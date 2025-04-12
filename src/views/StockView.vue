@@ -105,7 +105,52 @@
         </tbody>
       </table>
     </div>
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
+      <span>{{ currentPage }} / {{ totalPages }} page</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
+      <button @click="goToPage">Jump to</button>
+      <label>
+        Per page：
+        <select v-model="itemsPerPage" @change="currentPage = 1">
+          <option :value="10">10</option>
+          <option :value="50">50</option>
+          <option :value="100">100</option>
+        </select>
+      </label>
+    </div>
 
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      Create New Stock Holding
+    </button>
+
+    <div v-if="showForm" class="asset-form">
+      <label for="country">Country:</label>
+      <select id="country" v-model="newCountry">
+        <option disabled value="" hidden>Select Country</option>
+        <option value="TW">Taiwan</option>
+      </select>
+
+      <label for="ticker_symbol">Ticker Symbol:</label>
+      <input id="ticker_symbol" v-model="newTickerSymbol" placeholder="e.g., AAPL" />
+
+      <label for="average_price">Average Price:</label>
+      <input
+        id="average_price"
+        v-model="newAveragePrice"
+        type="number"
+        placeholder="Enter avg price"
+      />
+
+      <label for="quantity">Quantity:</label>
+      <input id="quantity" v-model="newQuantity" type="number" placeholder="Enter quantity" />
+
+      <div class="button-group">
+        <button @click="createHolding">Create</button>
+        <button @click="showForm = false" class="cancel-button">Cancel</button>
+      </div>
+    </div>
     <!-- Pagination and Form (unchanged) -->
   </div>
 </template>
@@ -155,13 +200,15 @@ const fetchHoldings = async () => {
 }
 
 const createHolding = async () => {
-  if (
-    !newTickerSymbol.value ||
-    newQuantity.value === '' ||
-    newAveragePrice.value === '' ||
-    newCountry.value === ''
-  ) {
-    alert(`Please enter Ticker Symbol, Quantity, and Average Price!`)
+  const missingFields = []
+
+  if (!newTickerSymbol.value) missingFields.push('Ticket Symbol')
+  if (!newQuantity.value) missingFields.push('Quantity')
+  if (!newAveragePrice.value) missingFields.push('Average Price')
+  if (!newCountry.value) missingFields.push('Country')
+
+  if (missingFields.length > 0) {
+    alert('Please fill in the following fields:\n' + missingFields.join(', '))
     return
   }
 
