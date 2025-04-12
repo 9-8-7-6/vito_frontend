@@ -60,20 +60,28 @@
             </td>
 
             <td>
-              {{
-                item.current_price
-                  ? item.quantity * item.current_price - item.quantity * item.average_price >= 0
-                    ? '+' +
-                      (
-                        item.quantity * item.current_price -
-                        item.quantity * item.average_price
-                      ).toFixed(2)
-                    : (
-                        item.quantity * item.current_price -
-                        item.quantity * item.average_price
-                      ).toFixed(2)
-                  : 'N/A'
-              }}
+              <span
+                :class="{
+                  profit:
+                    item.current_price &&
+                    item.quantity * item.current_price - item.quantity * item.average_price >= 0,
+                  loss:
+                    item.current_price &&
+                    item.quantity * item.current_price - item.quantity * item.average_price < 0,
+                }"
+              >
+                {{
+                  item.current_price
+                    ? (() => {
+                        const cost = item.quantity * item.average_price
+                        const value = item.quantity * item.current_price
+                        const profit = value - cost
+                        const percent = cost !== 0 ? ((profit / cost) * 100).toFixed(2) : '0.00'
+                        return (profit >= 0 ? '+' : '') + profit.toFixed(2) + ` (${percent}%)`
+                      })()
+                    : 'N/A'
+                }}
+              </span>
             </td>
 
             <td>
@@ -374,6 +382,16 @@ td {
 
 .cancel-button:hover {
   background-color: #c9302c;
+}
+
+.profit {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.loss {
+  color: #ff4d4f;
+  font-weight: bold;
 }
 
 .pagination {

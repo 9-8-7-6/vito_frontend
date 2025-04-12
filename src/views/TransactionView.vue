@@ -13,7 +13,6 @@
           <tr>
             <th>Number</th>
             <th>Asset</th>
-            <th>Transaction Type</th>
             <th>Amount</th>
             <th>Fee</th>
             <th>Transaction Time</th>
@@ -38,32 +37,19 @@
             </td>
 
             <td>
-              <button
-                v-if="editingTypeId !== transaction.id"
-                class="transaction-type-button"
-                @click="startEditingType(transaction.id, transaction.transaction_type)"
-              >
-                {{ transaction.transaction_type }}
-              </button>
-              <input
-                v-else
-                class="transaction-type-input"
-                v-model="editedTypeValue"
-                type="text"
-                @keyup.enter="
-                  updateTransactionField(transaction.id, 'transaction_type', editedTypeValue)
-                "
-                @blur="cancelEditingType"
-              />
-            </td>
-
-            <td>
-              <button
+              <span
                 v-if="editingId !== transaction.id"
+                :class="['amount-display', transaction.transaction_type]"
                 @click="startEditing(transaction.id, transaction.amount, 'amount')"
               >
-                {{ transaction.amount }}
-              </button>
+                {{
+                  transaction.transaction_type === 'Income'
+                    ? '+' + transaction.amount
+                    : transaction.transaction_type === 'Expense'
+                      ? '-' + transaction.amount
+                      : transaction.amount
+                }}
+              </span>
               <input
                 v-else-if="editingField === 'amount'"
                 v-model="editedValue"
@@ -347,8 +333,13 @@ watch(filterType, () => {
 })
 
 const createTransactionIncome = async () => {
-  if (!newAmount.value || !newToAssetId.value) {
-    alert('Please fill in all required fields')
+  const missingFields = []
+
+  if (!newAmount.value) missingFields.push('Amount')
+  if (!newToAssetId.value) missingFields.push('To Asset')
+
+  if (missingFields.length > 0) {
+    alert('Please fill in the following fields:\n' + missingFields.join(', '))
     return
   }
 
@@ -386,8 +377,13 @@ const createTransactionIncome = async () => {
 }
 
 const createTransactionExpense = async () => {
-  if (!newAmount.value || !newFromAssetId.value) {
-    alert('Please fill in all required fields')
+  const missingFields = []
+
+  if (!newAmount.value) missingFields.push('Amount')
+  if (!newFromAssetId.value) missingFields.push('From Asset')
+
+  if (missingFields.length > 0) {
+    alert('Please fill in the following fields:\n' + missingFields.join(', '))
     return
   }
 
@@ -425,8 +421,14 @@ const createTransactionExpense = async () => {
 }
 
 const createTransactionInternalTransfer = async () => {
-  if (!newAmount.value || !newFromAssetId.value || !newToAssetId.value || !newFee.value) {
-    alert('Please fill in all required fields')
+  const missingFields = []
+
+  if (!newAmount.value) missingFields.push('Amount')
+  if (!newFromAssetId.value) missingFields.push('From Asset')
+  if (!newToAssetId.value) missingFields.push('To Asset')
+
+  if (missingFields.length > 0) {
+    alert('Please fill in the following fields:\n' + missingFields.join(', '))
     return
   }
 
@@ -827,5 +829,22 @@ td {
 
 .filter-transaction-type button:hover {
   background-color: #444;
+}
+
+.amount-display {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.amount-display.Income {
+  color: #00bfff;
+}
+
+.amount-display.Expense {
+  color: #ff4d4f;
+}
+
+.amount-display.InternalTransfer {
+  color: white;
 }
 </style>
