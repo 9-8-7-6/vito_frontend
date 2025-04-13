@@ -15,25 +15,29 @@
             <td>{{ user.email }}</td>
             <td>
               <select v-model="country" class="select-box">
-                <option disabled value="">Please Select Country</option>
-                <option v-for="c in countryList" :key="c" :value="c">
-                  {{ c }}
+                <option disabled value="">
+                  {{ country || 'Please Select Country' }}
+                </option>
+                <option v-for="c in countries" :key="c.code" :value="c.name">
+                  {{ c.name }}
                 </option>
               </select>
 
               <select
-                v-if="selectedRegions"
-                v-model="region"
+                v-if="timezones.length > 0"
+                v-model="timezone"
                 class="select-box"
                 style="margin-left: 10px"
               >
-                <option disabled value="">Please Select Region</option>
-                <option v-for="r in selectedRegions" :key="r.name" :value="r.name">
-                  {{ r.name }}
+                <option disabled value="">
+                  {{ timezone || 'Please Select Timezone' }}
+                </option>
+                <option v-for="tz in timezones" :key="tz" :value="tz">
+                  {{ tz }}
                 </option>
               </select>
 
-              <div v-if="timeZone" style="margin-top: 10px">TimeZone: {{ timeZone }}</div>
+              <div v-if="timezone" style="margin-top: 10px">TimeZone: {{ timezone }}</div>
             </td>
           </tr>
         </tbody>
@@ -43,343 +47,61 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
-import { getUserData, updateUserData } from '../api/user'
+import { ref, computed, onMounted, watch } from 'vue'
+import { fetchCountries } from '../api/countries'
+import { getUserData } from '../api/user'
 
 const user = ref(null)
-const editing = ref(false)
-const editedValue = ref('')
-
-const countryList = [
-  'Afghanistan',
-  'Albania',
-  'Algeria',
-  'American Samoa',
-  'Andorra',
-  'Angola',
-  'Anguilla',
-  'Antarctica',
-  'Antigua and Barbuda',
-  'Argentina',
-  'Armenia',
-  'Aruba',
-  'Australia',
-  'Austria',
-  'Azerbaijan',
-  'Bahamas (the)',
-  'Bahrain',
-  'Bangladesh',
-  'Barbados',
-  'Belarus',
-  'Belgium',
-  'Belize',
-  'Benin',
-  'Bermuda',
-  'Bhutan',
-  'Bolivia (Plurinational State of)',
-  'Bonaire, Sint Eustatius and Saba',
-  'Bosnia and Herzegovina',
-  'Botswana',
-  'Bouvet Island',
-  'Brazil',
-  'British Indian Ocean Territory (the)',
-  'Brunei Darussalam',
-  'Bulgaria',
-  'Burkina Faso',
-  'Burundi',
-  'Cabo Verde',
-  'Cambodia',
-  'Cameroon',
-  'Canada',
-  'Cayman Islands (the)',
-  'Central African Republic (the)',
-  'Chad',
-  'Chile',
-  'China',
-  'Christmas Island',
-  'Cocos (Keeling) Islands (the)',
-  'Colombia',
-  'Comoros (the)',
-  'Congo (the Democratic Republic of the)',
-  'Congo (the)',
-  'Cook Islands (the)',
-  'Costa Rica',
-  'Croatia',
-  'Cuba',
-  'Curaçao',
-  'Cyprus',
-  'Czechia',
-  "Côte d'Ivoire",
-  'Denmark',
-  'Djibouti',
-  'Dominica',
-  'Dominican Republic (the)',
-  'Ecuador',
-  'Egypt',
-  'El Salvador',
-  'Equatorial Guinea',
-  'Eritrea',
-  'Estonia',
-  'Eswatini',
-  'Ethiopia',
-  'Falkland Islands (the) [Malvinas]',
-  'Faroe Islands (the)',
-  'Fiji',
-  'Finland',
-  'France',
-  'French Guiana',
-  'French Polynesia',
-  'French Southern Territories (the)',
-  'Gabon',
-  'Gambia (the)',
-  'Georgia',
-  'Germany',
-  'Ghana',
-  'Gibraltar',
-  'Greece',
-  'Greenland',
-  'Grenada',
-  'Guadeloupe',
-  'Guam',
-  'Guatemala',
-  'Guernsey',
-  'Guinea',
-  'Guinea-Bissau',
-  'Guyana',
-  'Haiti',
-  'Heard Island and McDonald Islands',
-  'Holy See (the)',
-  'Honduras',
-  'Hong Kong',
-  'Hungary',
-  'Iceland',
-  'India',
-  'Indonesia',
-  'Iran (Islamic Republic of)',
-  'Iraq',
-  'Ireland',
-  'Isle of Man',
-  'Israel',
-  'Italy',
-  'Jamaica',
-  'Japan',
-  'Jersey',
-  'Jordan',
-  'Kazakhstan',
-  'Kenya',
-  'Kiribati',
-  "Korea (the Democratic People's Republic of)",
-  'Korea (the Republic of)',
-  'Kuwait',
-  'Kyrgyzstan',
-  "Lao People's Democratic Republic (the)",
-  'Latvia',
-  'Lebanon',
-  'Lesotho',
-  'Liberia',
-  'Libya',
-  'Liechtenstein',
-  'Lithuania',
-  'Luxembourg',
-  'Macao',
-  'Madagascar',
-  'Malawi',
-  'Malaysia',
-  'Maldives',
-  'Mali',
-  'Malta',
-  'Marshall Islands (the)',
-  'Martinique',
-  'Mauritania',
-  'Mauritius',
-  'Mayotte',
-  'Mexico',
-  'Micronesia (Federated States of)',
-  'Moldova (the Republic of)',
-  'Monaco',
-  'Mongolia',
-  'Montenegro',
-  'Montserrat',
-  'Morocco',
-  'Mozambique',
-  'Myanmar',
-  'Namibia',
-  'Nauru',
-  'Nepal',
-  'Netherlands (the)',
-  'New Caledonia',
-  'New Zealand',
-  'Nicaragua',
-  'Niger (the)',
-  'Nigeria',
-  'Niue',
-  'Norfolk Island',
-  'Northern Mariana Islands (the)',
-  'Norway',
-  'Oman',
-  'Pakistan',
-  'Palau',
-  'Palestine, State of',
-  'Panama',
-  'Papua New Guinea',
-  'Paraguay',
-  'Peru',
-  'Philippines (the)',
-  'Pitcairn',
-  'Poland',
-  'Portugal',
-  'Puerto Rico',
-  'Qatar',
-  'Republic of North Macedonia',
-  'Romania',
-  'Russian Federation (the)',
-  'Rwanda',
-  'Réunion',
-  'Saint Barthélemy',
-  'Saint Helena, Ascension and Tristan da Cunha',
-  'Saint Kitts and Nevis',
-  'Saint Lucia',
-  'Saint Martin (French part)',
-  'Saint Pierre and Miquelon',
-  'Saint Vincent and the Grenadines',
-  'Samoa',
-  'San Marino',
-  'Sao Tome and Principe',
-  'Saudi Arabia',
-  'Senegal',
-  'Serbia',
-  'Seychelles',
-  'Sierra Leone',
-  'Singapore',
-  'Sint Maarten (Dutch part)',
-  'Slovakia',
-  'Slovenia',
-  'Solomon Islands',
-  'Somalia',
-  'South Africa',
-  'South Georgia and the South Sandwich Islands',
-  'South Sudan',
-  'Spain',
-  'Sri Lanka',
-  'Sudan (the)',
-  'Suriname',
-  'Svalbard and Jan Mayen',
-  'Sweden',
-  'Switzerland',
-  'Syrian Arab Republic',
-  'Taiwan',
-  'Tajikistan',
-  'Tanzania, United Republic of',
-  'Thailand',
-  'Timor-Leste',
-  'Togo',
-  'Tokelau',
-  'Tonga',
-  'Trinidad and Tobago',
-  'Tunisia',
-  'Turkey',
-  'Turkmenistan',
-  'Turks and Caicos Islands (the)',
-  'Tuvalu',
-  'Uganda',
-  'Ukraine',
-  'United Arab Emirates (the)',
-  'United Kingdom of Great Britain and Northern Ireland (the)',
-  'United States Minor Outlying Islands (the)',
-  'United States of America (the)',
-  'Uruguay',
-  'Uzbekistan',
-  'Vanuatu',
-  'Venezuela (Bolivarian Republic of)',
-  'Viet Nam',
-  'Virgin Islands (British)',
-  'Virgin Islands (U.S.)',
-  'Wallis and Futuna',
-  'Western Sahara',
-  'Yemen',
-  'Zambia',
-  'Zimbabwe',
-  'Åland Islands',
-]
-
-const regionData = {
-  Taiwan: [
-    { name: 'Taipei', timeZone: 'Asia/Taipei' },
-    { name: 'Kaohsiung', timeZone: 'Asia/Taipei' },
-  ],
-  Japan: [
-    { name: 'Tokyo', timeZone: 'Asia/Tokyo' },
-    { name: 'Osaka', timeZone: 'Asia/Tokyo' },
-  ],
-  'United States of America (the)': [
-    { name: 'New York', timeZone: 'America/New_York' },
-    { name: 'Los Angeles', timeZone: 'America/Los_Angeles' },
-  ],
-}
-
+const countries = ref([])
 const country = ref('')
-const region = ref('')
-
-const selectedRegions = computed(() => {
-  return regionData[country.value] || []
-})
+const timezone = ref('')
 
 const selectedCountry = computed(() => {
-  return countries.find((c) => c.name === country.value)
+  return countries.value.find((c) => c.name === country.value)
 })
 
-const selectedRegion = computed(() => {
-  return selectedCountry.value?.regions.find((r) => r.name === region.value)
-})
-
-const timeZone = computed(() => {
-  const regions = selectedRegions.value
-  const found = regions.find((r) => r.name === region.value)
-  return found?.timeZone || ''
+const timezones = computed(() => {
+  return selectedCountry.value?.timezone || []
 })
 
 const fetchUser = async () => {
   const response = await getUserData()
   user.value = response.data
 
+  await fetchCountryList()
+
   const savedCountry = localStorage.getItem('user-country')
-  const savedRegion = localStorage.getItem('user-region')
+  const savedTimezone = localStorage.getItem('user-timezone')
 
-  if (savedCountry) country.value = savedCountry
-  if (savedRegion) region.value = savedRegion
-}
+  if (savedCountry && countries.value.some((c) => c.name === savedCountry)) {
+    country.value = savedCountry
 
-const startEdit = () => {
-  editing.value = true
-  editedValue.value = user.value.balance.toString()
-}
+    await nextTick()
 
-const cancelEdit = () => {
-  editing.value = false
-}
-
-const updateBalance = async () => {
-  const updatedFields = { balance: parseFloat(editedValue.value) }
-  const response = await updateUserData(user.value.id, updatedFields)
-  if (response) {
-    user.value.balance = updatedFields.balance
-    editing.value = false
+    if (savedTimezone && timezones.value.includes(savedTimezone)) {
+      timezone.value = savedTimezone
+    }
   }
 }
 
-onMounted(fetchUser)
+const fetchCountryList = async () => {
+  const response = await fetchCountries()
+  const rawCountries = response?.data || []
+
+  countries.value = rawCountries.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+onMounted(async () => {
+  await fetchUser()
+})
 
 watch(country, (newVal) => {
   localStorage.setItem('user-country', newVal)
-
-  if (!regionData[newVal]) {
-    region.value = ''
-    localStorage.setItem('user-region', '')
-  }
+  timezone.value = ''
 })
 
-watch(region, (newVal) => {
-  localStorage.setItem('user-region', newVal)
+watch(timezone, (newVal) => {
+  localStorage.setItem('user-timezone', newVal)
 })
 </script>
 
