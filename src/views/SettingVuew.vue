@@ -38,6 +38,7 @@
               </select>
 
               <div v-if="timezone" style="margin-top: 10px">TimeZone: {{ timezone }}</div>
+              <button @click="handleUpdateUser" style="margin-top: 10px">Update User Info</button>
             </td>
           </tr>
         </tbody>
@@ -47,9 +48,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { fetchCountries } from '../api/countries'
-import { getUserData } from '../api/user'
+import { getUserData, updateUserData } from '../api/user'
 
 const user = ref(null)
 const countries = ref([])
@@ -89,6 +90,24 @@ const fetchCountryList = async () => {
   const rawCountries = response?.data || []
 
   countries.value = rawCountries.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+const handleUpdateUser = async () => {
+  if (!user.value) return
+
+  const fieldsToUpdate = {
+    country: country.value,
+    timezone: timezone.value,
+  }
+
+  try {
+    const response = await updateUserData(user.value.id, fieldsToUpdate)
+    console.log('User updated:', response?.data)
+    alert('User info updated successfully!')
+  } catch (err) {
+    console.error('Failed to update user:', err)
+    alert('Failed to update user info')
+  }
 }
 
 onMounted(async () => {
