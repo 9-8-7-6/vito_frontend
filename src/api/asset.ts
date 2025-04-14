@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { formatFieldDate } from '../utils/format'
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/assets`
 
@@ -14,6 +15,11 @@ export const getAsset = async () => {
     const parsedUser: { id: string } = JSON.parse(userData)
     const url = `${API_BASE_URL}/${parsedUser.id}`
     const response = await axios.get(url)
+
+    if (response && response.data) {
+      const formattedData = formatFieldDate(response.data, 'updated_at')
+      return { ...response, data: formattedData }
+    }
 
     console.log(
       `Sending GET request to url ${url} for ${parsedUser.id} asset, response is ${JSON.stringify(response, null, 2)}`,

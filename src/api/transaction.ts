@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
+import { formatFieldDate } from '../utils/format'
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
 
@@ -15,6 +16,11 @@ export const getTransactionsByUserId = async () => {
     const parsedUser: { id: string } = JSON.parse(userData)
     const url = `${API_BASE_URL}/account/${parsedUser.id}`
     const response = await axios.get(url)
+
+    if (response && response.data) {
+      const formattedData = formatFieldDate(response.data, 'transaction_time')
+      return { ...response, data: formattedData }
+    }
 
     console.log(
       `Sending GET request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
