@@ -1,14 +1,20 @@
 <template>
   <div class="container">
+    <!-- Login form wrapper -->
     <form @submit.prevent="handleLogin">
+      <!-- Username input -->
       <div class="form-group">
         <label for="username" class="label">Username</label>
         <input v-model="username" type="username" placeholder="Username" required />
       </div>
+
+      <!-- Password input -->
       <div class="form-group">
-        <label for="username" class="label">password</label>
+        <label for="username" class="label">Password</label>
         <input v-model="password" type="password" placeholder="Password" required />
       </div>
+
+      <!-- Submit button -->
       <button type="submit">Login</button>
     </form>
   </div>
@@ -16,19 +22,26 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth' // Pinia auth store
+import { useRouter } from 'vue-router' // Router for navigation
 
+// Store and router initialization
 const authStore = useAuthStore()
 const router = useRouter()
+
+// Form field state
 const username = ref('')
 const password = ref('')
 
+// Login handler
 const handleLogin = async () => {
   try {
+    // Attempt to log in via the store
     await authStore.login({ username: username.value, password: password.value })
+    // Redirect to home if successful
     router.push('/')
   } catch (error) {
+    // Show an alert with error details
     console.error('Login failed:', error)
     const errorMessage = error.message || 'Unknown Error'
     alert(`Login failed. Please check your credentials.\nError: ${errorMessage}`)

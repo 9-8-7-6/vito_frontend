@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="table-container">
+      <!-- Asset table -->
       <table>
         <thead>
           <tr>
@@ -11,7 +12,9 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Display paginated assets -->
           <tr v-for="(asset, index) in paginatedAssets" :key="asset.id">
+            <!-- Asset type editing logic -->
             <td>
               <span
                 v-if="editingTypeId !== asset.id"
@@ -29,6 +32,8 @@
                 @blur="cancelEditingType"
               />
             </td>
+
+            <!-- Asset balance editing logic -->
             <td>
               <input
                 v-if="editingId === asset.id"
@@ -49,7 +54,10 @@
                 {{ asset.balance > 0 ? '+' + asset.balance : asset.balance }}
               </span>
             </td>
+
             <td>{{ asset.updated_at }}</td>
+
+            <!-- Delete button -->
             <td>
               <button class="action-button" @click="handleDeleteAsset(asset.id)">Delete</button>
             </td>
@@ -58,6 +66,7 @@
       </table>
     </div>
 
+    <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
       <span>{{ currentPage }} / {{ totalPages }} page</span>
@@ -74,10 +83,12 @@
       </label>
     </div>
 
+    <!-- Create new asset section -->
     <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
       Create New Asset
     </button>
 
+    <!-- New asset form -->
     <div v-if="showForm" class="asset-form">
       <label for="asset_type">Asset Type:</label>
       <input id="asset_type" v-model="newAssetType" placeholder="Enter asset type" />
@@ -95,22 +106,27 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
 
+// State: Asset list and form inputs
 const assets = ref([])
 const newAssetType = ref('')
 const newBalance = ref('')
 
+// Editing state
 const editingId = ref(null)
 const editedValue = ref('')
-
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
+
+// Form visibility toggle
 const showForm = ref(false)
 
+// Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const jumpToPage = ref(1)
 const totalPages = computed(() => Math.ceil(assets.value.length / itemsPerPage.value))
 
+// Fetch data from API
 const fetchAssets = async () => {
   try {
     const response = await getAsset()
@@ -124,9 +140,10 @@ const fetchAssets = async () => {
   }
 }
 
+// Create asset API call
 const createAsset = async () => {
   if (!newAssetType.value || newBalance.value === '') {
-    alert(`Please enter both Asset Type and Balance! ${newAssetType.value}, ${newBalance.value}`)
+    alert(`Please enter both Asset Type and Balance!`)
     return
   }
 
@@ -137,47 +154,41 @@ const createAsset = async () => {
       newAssetType.value = ''
       newBalance.value = ''
       showForm.value = false
-    } else {
-      console.error('Invalid API response', response)
     }
   } catch (error) {
     console.error('Error adding assets:', error)
   }
 }
 
+// Delete asset API call
 const handleDeleteAsset = async (asset_id) => {
   try {
-    const response = await deleteAsset(asset_id)
-    window.location.reload()
+    await deleteAsset(asset_id)
+    window.location.reload() // reload to update list
   } catch (error) {
-    console.error('Error deleting assets:', error)
+    console.error('Error deleting asset:', error)
   }
 }
 
+// Edit balance logic
 const startEditing = async (assetId, balance) => {
   editingId.value = assetId
   editedValue.value = balance
-
   await nextTick()
 }
 
 const handleUpdateAsset = async (asset_id, asset_type) => {
   if (editedValue.value === '') {
-    alert(`Please enter Balance! ${editedValue.value}`)
+    alert('Please enter Balance!')
     return
   }
 
   try {
-    const updatedFields = {}
-    updatedFields.balance = parseFloat(editedValue.value)
+    const updatedFields = { balance: parseFloat(editedValue.value) }
     const response = await updateAsset(asset_id, updatedFields)
-    if (response) {
-      window.location.reload()
-    } else {
-      console.error('Invalid API response', response)
-    }
+    if (response) window.location.reload()
   } catch (error) {
-    console.error('Error adding assets:', error)
+    console.error('Error updating asset balance:', error)
   } finally {
     editingId.value = null
   }
@@ -187,30 +198,25 @@ const cancelEditing = () => {
   editingId.value = null
 }
 
+// Edit asset type logic
 const startEditingType = async (assetId, assetType) => {
   editingTypeId.value = assetId
   editedTypeValue.value = assetType
-
   await nextTick()
 }
 
 const handleUpdateAssetType = async (asset_id, balance) => {
   if (editedTypeValue.value.trim() === '') {
-    alert(`Please enter a valid Asset Type!`)
+    alert('Please enter a valid Asset Type!')
     return
   }
 
   try {
-    const updatedFields = {}
-    updatedFields.asset_type = editedTypeValue.value
+    const updatedFields = { asset_type: editedTypeValue.value }
     const response = await updateAsset(asset_id, updatedFields)
-    if (response) {
-      window.location.reload()
-    } else {
-      console.error('Invalid API response', response)
-    }
+    if (response) window.location.reload()
   } catch (error) {
-    console.error('Error adding assets:', error)
+    console.error('Error updating asset type:', error)
   } finally {
     editingId.value = null
   }
@@ -220,6 +226,7 @@ const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
+// Pagination logic
 const paginatedAssets = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
@@ -227,15 +234,11 @@ const paginatedAssets = computed(() => {
 })
 
 const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
+  if (currentPage.value > 1) currentPage.value--
 }
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
 const goToPage = () => {
@@ -244,8 +247,10 @@ const goToPage = () => {
   }
 }
 
+// Run on component mount
 onMounted(fetchAssets)
 </script>
+
 <style scoped>
 .container {
   display: flex;

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- Table for displaying stock holdings -->
     <div class="table-container">
       <table>
         <thead>
@@ -15,9 +16,12 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Iterate through paginated data -->
           <tr v-for="(item, index) in paginatedStockHoldings" :key="item.id">
+            <!-- Display stock symbol and company name -->
             <td>{{ `${item.ticker_symbol} (${item.company_name})` }}</td>
 
+            <!-- Editable average price field -->
             <td>
               <input
                 v-if="editingPriceId === item.id"
@@ -49,8 +53,10 @@
               </span>
             </td>
 
+            <!-- Current price (could be null) -->
             <td>{{ item.current_price ?? 'N/A' }}</td>
 
+            <!-- Editable quantity field -->
             <td>
               <input
                 v-if="editingQuantityId === item.id"
@@ -68,11 +74,15 @@
               </span>
             </td>
 
+            <!-- Cost = quantity * average price -->
             <td>{{ (item.quantity * item.average_price).toFixed(2) }}</td>
+
+            <!-- Value = quantity * current price -->
             <td>
               {{ item.current_price ? (item.quantity * item.current_price).toFixed(2) : 'N/A' }}
             </td>
 
+            <!-- Profit or Loss with percentage -->
             <td>
               <span
                 :class="{
@@ -98,6 +108,7 @@
               </span>
             </td>
 
+            <!-- Delete button -->
             <td>
               <button class="action-button" @click="handleDeleteHolding(item.id)">Delete</button>
             </td>
@@ -105,6 +116,8 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
       <span>{{ currentPage }} / {{ totalPages }} page</span>
@@ -121,10 +134,12 @@
       </label>
     </div>
 
+    <!-- Toggle create form -->
     <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
       Create New Stock Holding
     </button>
 
+    <!-- Form for adding new holding -->
     <div v-if="showForm" class="asset-form">
       <label for="country">Country:</label>
       <select id="country" v-model="newCountry">
@@ -146,12 +161,12 @@
       <label for="quantity">Quantity:</label>
       <input id="quantity" v-model="newQuantity" type="number" placeholder="Enter quantity" />
 
+      <!-- Submit/cancel buttons -->
       <div class="button-group">
         <button @click="createHolding">Create</button>
         <button @click="showForm = false" class="cancel-button">Cancel</button>
       </div>
     </div>
-    <!-- Pagination and Form (unchanged) -->
   </div>
 </template>
 
@@ -164,6 +179,7 @@ import {
   deleteStockHolding,
 } from '../api/stock'
 
+// Reactive references for holding data and form inputs
 const stockHoldings = ref([])
 const newTickerSymbol = ref('')
 const newQuantity = ref('')
@@ -171,23 +187,28 @@ const newAveragePrice = ref('')
 const newCountry = ref('')
 const showForm = ref(false)
 
+// Edit mode state
 const editedQuantity = ref('')
 const editedAveragePrice = ref('')
 const editingQuantityId = ref(null)
 const editingPriceId = ref(null)
 
+// Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const jumpToPage = ref(1)
 
+// Calculate total number of pages
 const totalPages = computed(() => Math.ceil(stockHoldings.value.length / itemsPerPage.value))
 
+// Paginated subset of holdings to display
 const paginatedStockHoldings = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
   return stockHoldings.value.slice(start, end)
 })
 
+// Fetch stock holdings from API
 const fetchHoldings = async () => {
   try {
     const response = await fetchStockHoldingsByAccount()
@@ -199,9 +220,9 @@ const fetchHoldings = async () => {
   }
 }
 
+// Handle form submission to create a new stock holding
 const createHolding = async () => {
   const missingFields = []
-
   if (!newTickerSymbol.value) missingFields.push('Ticket Symbol')
   if (!newQuantity.value) missingFields.push('Quantity')
   if (!newAveragePrice.value) missingFields.push('Average Price')
@@ -221,6 +242,7 @@ const createHolding = async () => {
     )
     if (response && response.data) {
       await fetchHoldings()
+      // Reset form
       newTickerSymbol.value = ''
       newQuantity.value = ''
       newAveragePrice.value = ''
@@ -232,6 +254,7 @@ const createHolding = async () => {
   }
 }
 
+// Delete a holding
 const handleDeleteHolding = async (holdingId) => {
   try {
     await deleteStockHolding(holdingId)
@@ -241,13 +264,15 @@ const handleDeleteHolding = async (holdingId) => {
   }
 }
 
+// Start editing average price for a holding
 const startEditingPrice = async (id, avgPrice) => {
   editingPriceId.value = id
-  editingQuantityId.value = null
+  editingQuantityId.value = null // prevent editing both fields at the same time
   editedAveragePrice.value = avgPrice.toString()
   await nextTick()
 }
 
+// Start editing quantity for a holding
 const startEditingQuantity = async (id, qty) => {
   editingQuantityId.value = id
   editingPriceId.value = null
@@ -255,6 +280,7 @@ const startEditingQuantity = async (id, qty) => {
   await nextTick()
 }
 
+// Submit update for a holding (either price, quantity, or both)
 const handleUpdateHolding = async (id) => {
   const update = {}
   if (editingQuantityId.value === id) {
@@ -276,27 +302,33 @@ const handleUpdateHolding = async (id) => {
   }
 }
 
+// Exit editing mode
 const cancelEditing = () => {
   editingQuantityId.value = null
   editingPriceId.value = null
 }
 
+// Pagination: go to previous page
 const prevPage = () => {
   if (currentPage.value > 1) currentPage.value--
 }
 
+// Pagination: go to next page
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
+// Jump to specified page
 const goToPage = () => {
   if (jumpToPage.value >= 1 && jumpToPage.value <= totalPages.value) {
     currentPage.value = jumpToPage.value
   }
 }
 
+// Fetch data when component mounts
 onMounted(fetchHoldings)
 </script>
+
 <style scoped>
 .container {
   display: flex;

@@ -2,8 +2,12 @@ import axios from 'axios'
 import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 import { formatFieldDate } from '../utils/format'
 
+// Base URL for transaction-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
 
+/**
+ * Fetch all transactions for the current user from localStorage.
+ */
 export const getTransactionsByUserId = async () => {
   const userData = localStorage.getItem('user')
 
@@ -18,6 +22,7 @@ export const getTransactionsByUserId = async () => {
     const response = await axios.get(url)
 
     if (response && response.data) {
+      // Format transaction_time field before returning
       const formattedData = formatFieldDate(response.data, 'transaction_time')
       return { ...response, data: formattedData }
     }
@@ -32,6 +37,9 @@ export const getTransactionsByUserId = async () => {
   }
 }
 
+/**
+ * Create an income transaction for the current user.
+ */
 export const addTransactionIncome = async (
   transaction_type: string,
   amount: number,
@@ -40,7 +48,6 @@ export const addTransactionIncome = async (
   notes: string,
 ) => {
   const userData = localStorage.getItem('user')
-
   if (!userData) {
     console.error("No 'user' data found in localstorage")
     return
@@ -51,9 +58,9 @@ export const addTransactionIncome = async (
     const url = API_BASE_URL
     const body = {
       from_asset_id: null,
-      to_asset_id: to_asset_id,
-      transaction_type: transaction_type,
-      amount: amount,
+      to_asset_id,
+      transaction_type,
+      amount,
       fee: 0,
       from_account_id: null,
       to_account_id: parsedUser.id,
@@ -63,17 +70,16 @@ export const addTransactionIncome = async (
     }
 
     const response = await axios.post(url, body)
-
-    console.log(
-      `Sending POST request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[POST] Income transaction sent:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }
 
+/**
+ * Create an expense transaction for the current user.
+ */
 export const addTransactionExpense = async (
   transaction_type: string,
   amount: number,
@@ -82,7 +88,6 @@ export const addTransactionExpense = async (
   notes: string,
 ) => {
   const userData = localStorage.getItem('user')
-
   if (!userData) {
     console.error("No 'user' data found in localstorage")
     return
@@ -92,10 +97,10 @@ export const addTransactionExpense = async (
     const parsedUser: { id: string } = JSON.parse(userData)
     const url = API_BASE_URL
     const body = {
-      from_asset_id: from_asset_id,
+      from_asset_id,
       to_asset_id: null,
-      transaction_type: transaction_type,
-      amount: amount,
+      transaction_type,
+      amount,
       fee: 0,
       from_account_id: parsedUser.id,
       to_account_id: null,
@@ -105,17 +110,16 @@ export const addTransactionExpense = async (
     }
 
     const response = await axios.post(url, body)
-
-    console.log(
-      `Sending post request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[POST] Expense transaction sent:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }
 
+/**
+ * Create an internal transfer transaction within the same account.
+ */
 export const addTransactionInternalTransfer = async (
   transaction_type: string,
   balance: number,
@@ -126,7 +130,6 @@ export const addTransactionInternalTransfer = async (
   notes: string,
 ) => {
   const userData = localStorage.getItem('user')
-
   if (!userData) {
     console.error("No 'user' data found in localstorage")
     return
@@ -136,30 +139,29 @@ export const addTransactionInternalTransfer = async (
     const parsedUser: { id: string } = JSON.parse(userData)
     const url = API_BASE_URL
     const body = {
-      from_asset_id: from_asset_id,
-      to_asset_id: to_asset_id,
-      transaction_type: transaction_type,
+      from_asset_id,
+      to_asset_id,
+      transaction_type,
       amount: balance,
-      fee: fee,
+      fee,
       from_account_id: parsedUser.id,
       to_account_id: parsedUser.id,
-      transaction_time: transaction_time,
+      transaction_time,
       notes: notes || null,
       image: null,
     }
 
     const response = await axios.post(url, body)
-
-    console.log(
-      `Sending post request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[POST] Internal transfer transaction sent:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }
 
+/**
+ * Create a transfer transaction between two different accounts.
+ */
 export const addTransactionTransfer = async (
   transaction_type: string,
   balance: number,
@@ -172,7 +174,6 @@ export const addTransactionTransfer = async (
   notes: string,
 ) => {
   const userData = localStorage.getItem('user')
-
   if (!userData) {
     console.error("No 'user' data found in localstorage")
     return
@@ -182,58 +183,51 @@ export const addTransactionTransfer = async (
     const parsedUser: { id: string } = JSON.parse(userData)
     const url = API_BASE_URL
     const body = {
-      from_asset_id: from_asset_id,
-      to_asset_id: to_asset_id,
-      transaction_type: transaction_type,
+      from_asset_id,
+      to_asset_id,
+      transaction_type,
       amount: balance,
-      fee: fee,
-      from_account_id: from_account_id,
-      to_account_id: to_account_id,
-      transaction_time: transaction_time,
+      fee,
+      from_account_id,
+      to_account_id,
+      transaction_time,
       notes: notes || null,
       image: null,
     }
 
     const response = await axios.post(url, body)
-
-    console.log(
-      `Sending post request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[POST] Inter-account transfer transaction sent:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }
 
+/**
+ * Delete a transaction by ID.
+ */
 export const deleteTransaction = async (transaction_id: string) => {
   try {
     const url = `${API_BASE_URL}/${transaction_id}`
     const response = await axios.delete(url)
-
-    console.log(
-      `Sending DELETE request to url ${url} for ${transaction_id} transaction, response: ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[DELETE] Transaction deleted:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }
 
+/**
+ * Update a transaction by ID with given fields.
+ */
 export const updateTransaction = async (
   transaction_id: string,
   updatedFields: Record<string, any>,
 ) => {
   try {
     const url = `${API_BASE_URL}/${transaction_id}`
-
     const response = await axios.patch(url, updatedFields)
-
-    console.log(
-      `Sending PATCH request to url ${url} for ${transaction_id} transaction, response: ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[PATCH] Transaction updated:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)

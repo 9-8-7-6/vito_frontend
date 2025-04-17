@@ -1,10 +1,16 @@
 import axios from 'axios'
 
+// Base URL for stock holding API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holding`
 
+/**
+ * Utility function to get the logged-in user's ID from localStorage.
+ * Returns null if not found or invalid.
+ */
 const getUserId = (): string | null => {
   const user = localStorage.getItem('user')
   if (!user) return null
+
   try {
     return JSON.parse(user).id
   } catch {
@@ -13,6 +19,9 @@ const getUserId = (): string | null => {
   }
 }
 
+/**
+ * Fetch all stock holdings for the current user (by account ID).
+ */
 export const fetchStockHoldingsByAccount = async () => {
   const accountId = getUserId()
   if (!accountId) return
@@ -27,6 +36,13 @@ export const fetchStockHoldingsByAccount = async () => {
   }
 }
 
+/**
+ * Create a new stock holding for the current user.
+ * @param tickerSymbol - Stock ticker symbol (e.g. AAPL)
+ * @param quantity - Number of shares
+ * @param averagePrice - Average price per share
+ * @param country - Country code (e.g. "US")
+ */
 export const createStockHolding = async (
   tickerSymbol: string,
   quantity: number,
@@ -53,6 +69,11 @@ export const createStockHolding = async (
   }
 }
 
+/**
+ * Update an existing stock holding.
+ * @param holdingId - The ID of the stock holding to update
+ * @param update - Fields to update (quantity and/or average_price)
+ */
 export const updateStockHolding = async (
   holdingId: string,
   update: {
@@ -70,6 +91,10 @@ export const updateStockHolding = async (
   }
 }
 
+/**
+ * Delete a stock holding by ID.
+ * @param holdingId - The ID of the stock holding to delete
+ */
 export const deleteStockHolding = async (holdingId: string) => {
   const url = `${API_BASE_URL}/${holdingId}`
   try {

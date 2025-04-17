@@ -10,10 +10,12 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Display user info once loaded -->
           <tr v-if="user">
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>
+              <!-- Country dropdown -->
               <select v-model="country" class="select-box">
                 <option disabled value="">
                   {{ country || 'Please Select Country' }}
@@ -23,6 +25,7 @@
                 </option>
               </select>
 
+              <!-- Timezone dropdown (only if country has timezones) -->
               <select
                 v-if="timezones.length > 0"
                 v-model="timezone"
@@ -37,7 +40,10 @@
                 </option>
               </select>
 
+              <!-- Display selected timezone -->
               <div v-if="timezone" style="margin-top: 10px">TimeZone: {{ timezone }}</div>
+
+              <!-- Update button -->
               <button @click="handleUpdateUser" style="margin-top: 10px">Update User Info</button>
             </td>
           </tr>
@@ -52,31 +58,38 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { fetchCountries } from '../api/countries'
 import { getUserData, updateUserData } from '../api/user'
 
+// Reactive states
 const user = ref(null)
 const countries = ref([])
 const country = ref('')
 const timezone = ref('')
 
+// Computed: find country object based on selected name
 const selectedCountry = computed(() => {
   return countries.value.find((c) => c.name === country.value)
 })
 
+// Computed: get timezones list from selected country
 const timezones = computed(() => {
   return selectedCountry.value?.timezone || []
 })
 
+// Load user and country info
 const fetchUser = async () => {
   const response = await getUserData()
   user.value = response.data
 
+  // Load countries
   await fetchCountryList()
 
+  // Restore from local storage (if any)
   const savedCountry = localStorage.getItem('user-country')
   const savedTimezone = localStorage.getItem('user-timezone')
 
   if (savedCountry && countries.value.some((c) => c.name === savedCountry)) {
     country.value = savedCountry
 
+    // Wait for timezone options to be ready
     await nextTick()
 
     if (savedTimezone && timezones.value.includes(savedTimezone)) {
@@ -85,13 +98,16 @@ const fetchUser = async () => {
   }
 }
 
+// Load countries from backend
 const fetchCountryList = async () => {
   const response = await fetchCountries()
   const rawCountries = response?.data || []
 
+  // Sort alphabetically
   countries.value = rawCountries.sort((a, b) => a.name.localeCompare(b.name))
 }
 
+// Submit updated country & timezone
 const handleUpdateUser = async () => {
   if (!user.value) return
 
@@ -110,13 +126,15 @@ const handleUpdateUser = async () => {
   }
 }
 
+// Lifecycle: load on mount
 onMounted(async () => {
   await fetchUser()
 })
 
+// Watchers: sync local storage
 watch(country, (newVal) => {
   localStorage.setItem('user-country', newVal)
-  timezone.value = ''
+  timezone.value = '' // Reset timezone on country change
 })
 
 watch(timezone, (newVal) => {

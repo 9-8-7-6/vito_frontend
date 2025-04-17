@@ -1,21 +1,25 @@
 <template>
   <div class="container">
     <form @submit.prevent="handleRegister">
+      <!-- Username input -->
       <div class="form-group">
         <label for="username" class="label">Username</label>
         <input v-model="username" type="text" placeholder="Username" required />
       </div>
 
+      <!-- Email input -->
       <div class="form-group">
         <label for="email" class="label">Email</label>
         <input v-model="email" type="email" placeholder="Email" required />
       </div>
 
+      <!-- Password input -->
       <div class="form-group">
         <label for="password" class="label">Password</label>
         <input v-model="password" type="password" placeholder="Password" required />
       </div>
 
+      <!-- Submit button -->
       <button type="submit">Register</button>
     </form>
   </div>
@@ -23,24 +27,31 @@
 
 <script setup>
 import { ref } from 'vue'
-import { registerUser } from '@/api/auth'
+import { registerUser } from '@/api/auth' // API call to register user
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Form input fields
 const username = ref('')
 const email = ref('')
 const password = ref('')
 
+// Handles form submission for registration
 const handleRegister = async () => {
   try {
+    // Send registration data to backend API
     await registerUser({
       username: username.value,
       email: email.value,
       password: password.value,
     })
+
+    // On success, notify user and redirect to login page
     alert('Register successfully! Please login')
     router.push('/login')
   } catch (error) {
+    // Handle registration failure
     console.error(error)
     const errorMessage = error.response?.data?.message || error.message || 'Unknown Error'
     alert(`Register failed. Please check your input.\nError message: ${errorMessage}`)

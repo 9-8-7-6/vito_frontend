@@ -1,6 +1,9 @@
 <template>
+  <!-- Outer container for the entire transaction interface -->
   <div class="container">
+    <!-- Container for the transaction table and filters -->
     <div class="table-container">
+      <!-- Buttons to filter transactions by type -->
       <div class="filter-transaction-type">
         <button @click="filterType = 'All'">All</button>
         <button @click="filterType = 'Income'">Income</button>
@@ -8,6 +11,7 @@
         <button @click="filterType = 'InternalTransfer'">Internal Transfer</button>
       </div>
 
+      <!-- Table to display paginated transactions -->
       <table>
         <thead>
           <tr>
@@ -21,9 +25,12 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Iterate through paginated transactions -->
           <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
+            <!-- Show running number considering current page -->
             <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
 
+            <!-- Display asset direction (e.g. A -> B) -->
             <td>
               <span v-if="transaction.from_asset_type && transaction.to_asset_type">
                 {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
@@ -36,12 +43,14 @@
               </span>
             </td>
 
+            <!-- Editable amount field -->
             <td>
               <span
                 v-if="editingId !== transaction.id"
                 :class="['amount-display', transaction.transaction_type]"
                 @click="startEditing(transaction.id, transaction.amount, 'amount')"
               >
+                <!-- Show +amount or -amount based on transaction type -->
                 {{
                   transaction.transaction_type === 'Income'
                     ? '+' + transaction.amount
@@ -50,6 +59,7 @@
                       : transaction.amount
                 }}
               </span>
+              <!-- Input field shown when editing amount -->
               <input
                 v-else-if="editingField === 'amount'"
                 v-model="editedValue"
@@ -61,6 +71,7 @@
               />
             </td>
 
+            <!-- Editable fee field -->
             <td>
               <span
                 v-if="editingId !== transaction.id"
@@ -68,6 +79,7 @@
               >
                 {{ transaction.fee }}
               </span>
+              <!-- Input field shown when editing fee -->
               <input
                 v-else-if="editingField === 'fee'"
                 v-model="editedValue"
@@ -79,8 +91,11 @@
               />
             </td>
 
+            <!-- Display time and notes -->
             <td>{{ transaction.transaction_time }}</td>
             <td>{{ transaction.notes }}</td>
+
+            <!-- Delete transaction button -->
             <td>
               <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
                 Delete
@@ -91,14 +106,17 @@
       </table>
     </div>
 
+    <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
       <span>{{ currentPage }} / {{ totalPages }} page</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
 
+      <!-- Jump to specific page -->
       <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
       <button @click="goToPage">Jump to</button>
 
+      <!-- Items per page dropdown -->
       <label>
         Per page：
         <select v-model="itemsPerPage" @change="currentPage = 1">
@@ -109,20 +127,24 @@
       </label>
     </div>
 
+    <!-- Button to open create form -->
     <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
       Create New Transaction
     </button>
 
+    <!-- Choose transaction type -->
     <div v-if="showForm" class="transaction-form">
       <button @click="toggleTransaction('income')">Income</button>
       <button @click="toggleTransaction('expense')">Expense</button>
       <button @click="toggleTransaction('internalTransfer')">Internal Transfer</button>
-      <!-- Todo -->
+      <!-- Placeholder for future transfer feature -->
       <!-- <button @click="toggleTransaction('Transfer')">Transfer</button> -->
       <button @click="toggleTransaction('')">Cancel</button>
     </div>
 
+    <!-- ====================== Transaction Forms ======================= -->
     <div class="create-transaction-form">
+      <!-- Income transaction form -->
       <div v-if="showIncome" class="create-transaction-form-wrapper">
         <h2>New Income Transaction</h2>
         <div class="form-group">
@@ -153,6 +175,8 @@
         <button @click="createTransactionIncome">Submit</button>
         <button class="cancel-button" @click="toggleTransaction('')">Cancel</button>
       </div>
+
+      <!-- Expense transaction form -->
       <div v-if="showExpense" class="create-transaction-form-wrapper">
         <h2>New Expense Transaction</h2>
 
@@ -185,6 +209,7 @@
         <button class="cancel-button" @click="toggleTransaction('')">Cancel</button>
       </div>
 
+      <!-- Internal transfer transaction form -->
       <div v-if="showInternalTransfer" class="create-transaction-form-wrapper">
         <h2>New Internal Transfer Transaction</h2>
 
@@ -231,6 +256,8 @@
         <button @click="createTransactionInternalTransfer">Submit</button>
         <button class="cancel-button" @click="toggleTransaction('')">Cancel</button>
       </div>
+
+      <!-- Placeholder for general Transfer (future feature) -->
       <div v-if="showTransfer" class="create-transaction-form-wrapper">
         <h1>Transfer</h1>
       </div>
@@ -250,12 +277,14 @@ import {
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
 
+// === UI State ===
 const showForm = ref(false)
 const showIncome = ref(false)
 const showExpense = ref(false)
 const showTransfer = ref(false)
 const showInternalTransfer = ref(false)
 
+// === Form Fields for Creating Transaction ===
 const newAmount = ref('')
 const newTransactionTime = ref('')
 const newNotes = ref('')
@@ -264,9 +293,11 @@ const newFromAssetId = ref('')
 const newToAssetId = ref('')
 const newFee = ref('')
 
+// === Data Lists ===
 const transactions = ref([])
 const assets = ref([])
 
+// === Inline Editing State ===
 const editingId = ref(null)
 const editedValue = ref('')
 const editingField = ref('')
@@ -274,11 +305,13 @@ const editingField = ref('')
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
 
+// === Pagination ===
 const currentPage = ref(1)
 const itemsPerPage = ref(
   localStorage.getItem('itemsPerPage') ? parseInt(localStorage.getItem('itemsPerPage'), 10) : 10,
 )
 
+// Save pagination preference to localStorage
 watch(itemsPerPage, (newVal) => {
   localStorage.setItem('itemsPerPage', newVal)
 })
@@ -286,8 +319,14 @@ watch(itemsPerPage, (newVal) => {
 const jumpToPage = ref(1)
 const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
 
+// === Filtering by Transaction Type ===
 const filterType = ref('All')
+watch(filterType, () => {
+  currentPage.value = 1
+  jumpToPage.value = 1
+})
 
+// === UI Transaction Type Toggle ===
 const toggleTransaction = (type) => {
   showIncome.value = false
   showExpense.value = false
@@ -301,6 +340,7 @@ const toggleTransaction = (type) => {
   if (type === 'internalTransfer') showInternalTransfer.value = true
 }
 
+// === Fetch API Data ===
 const fetchTransactions = async () => {
   try {
     const response = await getTransactionsByUserId()
@@ -332,9 +372,9 @@ watch(filterType, () => {
   jumpToPage.value = 1
 })
 
+// === Create Transaction APIs ===
 const createTransactionIncome = async () => {
   const missingFields = []
-
   if (!newAmount.value) missingFields.push('Amount')
   if (!newToAssetId.value) missingFields.push('To Asset')
 
@@ -343,10 +383,7 @@ const createTransactionIncome = async () => {
     return
   }
 
-  let isoString = null
-  if (newTransactionTime.value) {
-    isoString = new Date(newTransactionTime.value).toISOString()
-  }
+  let isoString = newTransactionTime.value ? new Date(newTransactionTime.value).toISOString() : null
 
   try {
     const response = await addTransactionIncome(
@@ -359,16 +396,15 @@ const createTransactionIncome = async () => {
 
     if (response && response.data) {
       alert('Transaction added successfully!')
-
+      // Clear form
       newAmount.value = ''
       newToAssetId.value = ''
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
-      window.location.reload()
+      window.location.reload() // Reload to reflect new transaction
     } else {
-      console.error('Invalid API response', response)
-      alert('Failed to add transaction. Please try again.')
+      alert('Failed to add transaction.')
     }
   } catch (error) {
     console.error('Error adding transaction:', error)
@@ -378,7 +414,6 @@ const createTransactionIncome = async () => {
 
 const createTransactionExpense = async () => {
   const missingFields = []
-
   if (!newAmount.value) missingFields.push('Amount')
   if (!newFromAssetId.value) missingFields.push('From Asset')
 
@@ -387,10 +422,7 @@ const createTransactionExpense = async () => {
     return
   }
 
-  let isoString = null
-  if (newTransactionTime.value) {
-    isoString = new Date(newTransactionTime.value).toISOString()
-  }
+  let isoString = newTransactionTime.value ? new Date(newTransactionTime.value).toISOString() : null
 
   try {
     const response = await addTransactionExpense(
@@ -403,7 +435,6 @@ const createTransactionExpense = async () => {
 
     if (response && response.data) {
       alert('Transaction added successfully!')
-
       newAmount.value = ''
       newFromAssetId.value = ''
       newTransactionTime.value = ''
@@ -411,8 +442,7 @@ const createTransactionExpense = async () => {
       showIncome.value = false
       window.location.reload()
     } else {
-      console.error('Invalid API response', response)
-      alert('Failed to add transaction. Please try again.')
+      alert('Failed to add transaction.')
     }
   } catch (error) {
     console.error('Error adding transaction:', error)
@@ -422,7 +452,6 @@ const createTransactionExpense = async () => {
 
 const createTransactionInternalTransfer = async () => {
   const missingFields = []
-
   if (!newAmount.value) missingFields.push('Amount')
   if (!newFromAssetId.value) missingFields.push('From Asset')
   if (!newToAssetId.value) missingFields.push('To Asset')
@@ -432,10 +461,7 @@ const createTransactionInternalTransfer = async () => {
     return
   }
 
-  let isoString = null
-  if (newTransactionTime.value) {
-    isoString = new Date(newTransactionTime.value).toISOString()
-  }
+  let isoString = newTransactionTime.value ? new Date(newTransactionTime.value).toISOString() : null
 
   try {
     const response = await addTransactionInternalTransfer(
@@ -450,7 +476,6 @@ const createTransactionInternalTransfer = async () => {
 
     if (response && response.data) {
       alert('Transaction added successfully!')
-
       newFromAssetId.value = ''
       newToAssetId.value = ''
       newFee.value = ''
@@ -460,8 +485,7 @@ const createTransactionInternalTransfer = async () => {
       showIncome.value = false
       window.location.reload()
     } else {
-      console.error('Invalid API response', response)
-      alert('Failed to add transaction. Please try again.')
+      alert('Failed to add transaction.')
     }
   } catch (error) {
     console.error('Error adding transaction:', error)
@@ -469,34 +493,34 @@ const createTransactionInternalTransfer = async () => {
   }
 }
 
+// === Delete Transaction ===
 const handleDeleteTransaction = async (transaction_id) => {
   try {
     const response = await deleteTransaction(transaction_id)
     window.location.reload()
   } catch (error) {
-    console.error('Error deleting assets:', error)
+    console.error('Error deleting transaction:', error)
   }
 }
 
+// === Edit Fields ===
 const startEditing = async (transactionId, value, field) => {
   editingId.value = transactionId
   editingField.value = field
   editedValue.value = value
-
   await nextTick()
 }
 
 const startEditingType = async (transactionId, transactionType) => {
   editingTypeId.value = transactionId
   editedTypeValue.value = transactionType
-
   await nextTick()
 }
 
 const updateTransactionField = async (transaction_id, field, value) => {
   try {
     const updatedFields = { [field]: value }
-    const response = await updateTransaction(transaction_id, updatedFields)
+    await updateTransaction(transaction_id, updatedFields)
     await fetchTransactions()
     cancelEditing()
     cancelEditingType()
@@ -508,12 +532,10 @@ const updateTransactionField = async (transaction_id, field, value) => {
 const handleUpdateTransaction = async (transaction_id, field, value) => {
   try {
     const updatedFields = {}
-
-    const response = await updateTransaction(transaction_id, updatedFields)
-
+    await updateTransaction(transaction_id, updatedFields)
     window.location.reload()
   } catch (error) {
-    console.error('Error deleting assets:', error)
+    console.error('Error updating transaction:', error)
   }
 }
 
@@ -528,30 +550,27 @@ const cancelEditingType = () => {
   editedTypeValue.value = ''
 }
 
+// === Computed Data ===
+// Filter by transaction type
 const filteredTransactions = computed(() => {
-  if (filterType.value === 'All') {
-    return transactions.value
-  } else {
-    return transactions.value.filter((t) => t.transaction_type === filterType.value)
-  }
+  if (filterType.value === 'All') return transactions.value
+  return transactions.value.filter((t) => t.transaction_type === filterType.value)
 })
 
+// Paginate the filtered data
 const paginatedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
   return filteredTransactions.value.slice(start, end)
 })
 
+// === Pagination Methods ===
 const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
+  if (currentPage.value > 1) currentPage.value--
 }
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
 const goToPage = () => {
@@ -560,11 +579,13 @@ const goToPage = () => {
   }
 }
 
+// === Initial Data Load on Mount ===
 onMounted(async () => {
   await fetchTransactions()
   await fetchAssetType()
 })
 </script>
+
 <style scoped>
 .container {
   display: flex;

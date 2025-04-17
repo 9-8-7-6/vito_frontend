@@ -1,7 +1,11 @@
 <template>
   <nav class="navbar">
+    <!-- Left-aligned navigation links -->
     <div class="left-links">
+      <!-- Always show homepage -->
       <router-link to="/" class="logo">Homepage</router-link>
+
+      <!-- Authenticated user-only links -->
       <router-link v-if="authStore.user" to="/asset" class="nav-link">Asset</router-link>
       <router-link v-if="authStore.user" to="/transaction" class="nav-link"
         >Transaction</router-link
@@ -9,13 +13,19 @@
       <router-link v-if="authStore.user" to="/stock" class="nav-link">Stock</router-link>
     </div>
 
+    <!-- Right-aligned dropdown for account-related actions -->
     <div class="nav-menu">
       <button @click="toggleDropdown" class="menu-button">Account</button>
+
+      <!-- Dropdown menu shows/hides based on `dropdownVisible` -->
       <div v-show="dropdownVisible" class="dropdown">
+        <!-- Guest-only links -->
         <router-link v-if="!authStore.user" to="/register" class="dropdown-item"
           >Register</router-link
         >
         <router-link v-if="!authStore.user" to="/login" class="dropdown-item">Login</router-link>
+
+        <!-- Logged-in user links -->
         <button v-if="authStore.user" @click="handleLogout" class="dropdown-item">Logout</button>
         <router-link v-if="authStore.user" to="/setting" class="dropdown-item">Setting</router-link>
       </div>
@@ -25,21 +35,24 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth' // Pinia store for auth state
+import { useRouter } from 'vue-router' // Router for navigation
 
+// Access auth state and routing
 const authStore = useAuthStore()
 const router = useRouter()
-const dropdownVisible = ref(false)
 
+// Dropdown menu visibility toggle
+const dropdownVisible = ref(false)
 const toggleDropdown = () => {
   dropdownVisible.value = !dropdownVisible.value
 }
 
+// Logout handler
 const handleLogout = () => {
-  authStore.logout()
-  router.push('/login')
-  window.location.reload()
+  authStore.logout() // Clear user state in Pinia
+  router.push('/login') // Redirect to login page
+  window.location.reload() // Force page reload to clear session state
   dropdownVisible.value = false
 }
 </script>
