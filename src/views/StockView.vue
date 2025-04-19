@@ -46,8 +46,8 @@
                 {{
                   item.current_price
                     ? item.quantity * item.current_price - item.quantity * item.average_price >= 0
-                      ? '+' + Number(item.average_price).toFixed(2)
-                      : '-' + Number(item.average_price).toFixed(2)
+                      ? Number(item.average_price).toFixed(2)
+                      : Number(item.average_price).toFixed(2)
                     : Number(item.average_price).toFixed(2)
                 }}
               </span>
@@ -145,6 +145,7 @@
       <select id="country" v-model="newCountry">
         <option disabled value="" hidden>Select Country</option>
         <option value="TW">Taiwan</option>
+        <option value="US">United States</option>
       </select>
 
       <label for="ticker_symbol">Ticker Symbol:</label>
@@ -478,12 +479,12 @@ td {
 }
 
 .profit {
-  color: #00bfff;
+  color: #ff4d4f;
   font-weight: bold;
 }
 
 .loss {
-  color: #ff4d4f;
+  color: #0d8d24;
   font-weight: bold;
 }
 
