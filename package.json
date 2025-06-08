@@ -13,7 +13,7 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist --cname www.vito-tw.com"
   },
   "dependencies": {
     "axios": "^1.8.1",
