@@ -46,7 +46,7 @@ router.beforeEach(async (to, from, next) => {
   // If not authenticated, clear local state and storage
   if (!isAuthenticated) {
     authStore.user = null
-    localStorage.removeItem('user')
+    removeCookie('user', { path: '/' })
     removeCookie('id', { path: '/' })
   }
 

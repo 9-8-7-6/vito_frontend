@@ -10,7 +10,7 @@ fi
 echo "🌐 Generating $TARGET_FILE for Vite..."
 
 cat > "$TARGET_FILE" <<EOF
-VITE_API_BASE_URL=http://3.107.148.36:8000
+VITE_API_BASE_URL=https://api.vito-tw.com
 EOF
 
 echo "$TARGET_FILE created with VITE_API_BASE_URL"

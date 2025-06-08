@@ -1,21 +1,24 @@
 import axios from 'axios'
+import { formatFieldDate } from '../utils/format'
+import { getCookie } from 'typescript-cookie'
+
 
 // Define the base URL for user-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`
 
 /**
- * Fetch the current user's data from the backend using their ID stored in localStorage.
+ * Fetch the current user's data from the backend using their ID stored in cookie.
  *
- * - Checks if user data exists in localStorage
+ * - Checks if user data exists in cookie
  * - Parses the user object to retrieve the ID
  * - Sends a GET request to `/users/{id}`
  * - Logs and returns the server response
  */
 export const getUserData = async () => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
 
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 

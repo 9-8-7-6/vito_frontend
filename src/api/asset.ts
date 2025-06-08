@@ -1,19 +1,20 @@
 import axios from 'axios'
 import { formatFieldDate } from '../utils/format'
+import { getCookie } from 'typescript-cookie'
 
 // Define the base API URL for asset-related requests
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/assets`
 
 /**
  * Fetches all assets for the currently logged-in user.
- * It retrieves the user ID from localStorage, then sends a GET request.
+ * It retrieves the user ID from Cookie, then sends a GET request.
  * The response is formatted by converting 'updated_at' fields to readable format.
  */
 export const getAsset = async () => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
 
   if (!userData) {
-    console.error("No 'user' data found in localStorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 
@@ -42,10 +43,10 @@ export const getAsset = async () => {
  * Sends a POST request with asset_type and balance.
  */
 export const addAsset = async (asset_type: string, balance: number) => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
 
   if (!userData) {
-    console.error("No 'user' data found in localStorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 

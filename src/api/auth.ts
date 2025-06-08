@@ -101,15 +101,6 @@ export const logoutUser = async () => {
 export const AuthCheck = async () => {
   const url = `${API_BASE_URL}/auth/check`
 
-  const token = getCookie('id')
-  console.log('Checking authentication, token:', token)
-
-  // If token is not available, user is not authenticated
-  if (!token) {
-    console.log("AuthCheck doesn't get cookie named id, something wrong happens")
-    return false
-  }
-
   try {
     const response = await axios.post(`${url}`, {}, { withCredentials: true })
     return response.status === 200

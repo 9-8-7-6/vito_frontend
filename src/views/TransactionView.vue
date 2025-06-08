@@ -276,6 +276,8 @@ import {
   updateTransaction,
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
+import { getCookie, setCookie } from 'typescript-cookie'
+
 
 // === UI State ===
 const showForm = ref(false)
@@ -308,12 +310,16 @@ const editedTypeValue = ref('')
 // === Pagination ===
 const currentPage = ref(1)
 const itemsPerPage = ref(
-  localStorage.getItem('itemsPerPage') ? parseInt(localStorage.getItem('itemsPerPage'), 10) : 10,
+  parseInt(getCookie('itemsPerPage') || '10', 10)
 )
 
-// Save pagination preference to localStorage
+// Save pagination preference to cookie
 watch(itemsPerPage, (newVal) => {
-  localStorage.setItem('itemsPerPage', newVal)
+  setCookie('itemsPerPage', newVal.toString(), {
+    path: '/',
+    sameSite: 'none',
+    secure: true,
+  })
 })
 
 const jumpToPage = ref(1)

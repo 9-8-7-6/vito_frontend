@@ -2,17 +2,18 @@ import axios from 'axios'
 import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 import { formatFieldDate } from '../utils/format'
 
+
 // Base URL for transaction-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
 
 /**
- * Fetch all transactions for the current user from localStorage.
+ * Fetch all transactions for the current user from cookie.
  */
 export const getTransactionsByUserId = async () => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
 
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 
@@ -47,9 +48,9 @@ export const addTransactionIncome = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 
@@ -87,9 +88,9 @@ export const addTransactionExpense = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 
@@ -129,9 +130,9 @@ export const addTransactionInternalTransfer = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 
@@ -173,9 +174,9 @@ export const addTransactionTransfer = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = localStorage.getItem('user')
+  const userData = getCookie('user')
   if (!userData) {
-    console.error("No 'user' data found in localstorage")
+    console.error("No 'user' data found in cookie")
     return
   }
 

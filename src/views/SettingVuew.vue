@@ -57,6 +57,8 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { fetchCountries } from '../api/countries'
 import { getUserData, updateUserData } from '../api/user'
+import { getCookie, setCookie } from 'typescript-cookie'
+
 
 // Reactive states
 const user = ref(null)
@@ -82,9 +84,9 @@ const fetchUser = async () => {
   // Load countries
   await fetchCountryList()
 
-  // Restore from local storage (if any)
-  const savedCountry = localStorage.getItem('user-country')
-  const savedTimezone = localStorage.getItem('user-timezone')
+  // Restore from cookie (if any)
+  const savedCountry = getCookie('user-country')
+  const savedTimezone = getCookie('user-timezone')
 
   if (savedCountry && countries.value.some((c) => c.name === savedCountry)) {
     country.value = savedCountry
@@ -131,14 +133,18 @@ onMounted(async () => {
   await fetchUser()
 })
 
-// Watchers: sync local storage
+// Watchers: sync cookie
 watch(country, (newVal) => {
-  localStorage.setItem('user-country', newVal)
+  setCookie('user-country', newVal, {
+    path: '/',
+    sameSite: 'none',
+    secure: true,
+  })
   timezone.value = '' // Reset timezone on country change
 })
 
 watch(timezone, (newVal) => {
-  localStorage.setItem('user-timezone', newVal)
+  setCookie('user-timezone', newVal)
 })
 </script>
 

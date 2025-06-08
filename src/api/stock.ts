@@ -1,20 +1,22 @@
 import axios from 'axios'
+import { getCookie } from 'typescript-cookie'
+
 
 // Base URL for stock holding API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holding`
 
 /**
- * Utility function to get the logged-in user's ID from localStorage.
+ * Utility function to get the logged-in user's ID from cookie.
  * Returns null if not found or invalid.
  */
 const getUserId = (): string | null => {
-  const user = localStorage.getItem('user')
+  const user = getCookie('user')
   if (!user) return null
 
   try {
     return JSON.parse(user).id
   } catch {
-    console.error('Invalid user data in localStorage')
+    console.error('Invalid user data in cookie')
     return null
   }
 }

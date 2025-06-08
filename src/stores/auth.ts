@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { loginUser, logoutUser } from '../api/auth'
+import { getCookie, removeCookie, setCookie } from 'typescript-cookie'
 
 // Define the structure of credentials used for login
 interface Credentials {
@@ -10,15 +11,19 @@ interface Credentials {
 
 // Create a Pinia store named 'auth'
 export const useAuthStore = defineStore('auth', () => {
-  // Reactive user state initialized from localStorage (if available)
-  const user = ref<any>(JSON.parse(localStorage.getItem('user') || 'null'))
+  // Reactive user state initialized from cookie (if available)
+  const user = ref<any>(JSON.parse(getCookie('user') || 'null'))
 
   // Login function: attempts login, stores user data if successful
   const login = async (credentials: Credentials) => {
     try {
       const response = await loginUser(credentials)
       user.value = response.data.user // Update the user state
-      localStorage.setItem('user', JSON.stringify(response.data.user)) // Persist to localStorage
+      setCookie('user', JSON.stringify(response.data.user), {
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      }) // Persist to cookie
       return true
     } catch (error) {
       console.error('Login failed in store:', error)
@@ -26,12 +31,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Logout function: clears user session and localStorage
+  // Logout function: clears user session and cookie
   const logout = async () => {
     try {
       await logoutUser()
       user.value = null // Clear user state
-      localStorage.removeItem('user') // Remove from localStorage
+      removeCookie('user', { path: '/' }) // Remove from cookie
     } catch (error) {
       console.error('Logout failed:', error)
     }
