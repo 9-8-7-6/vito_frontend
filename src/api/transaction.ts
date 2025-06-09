@@ -84,7 +84,7 @@ export const addTransactionExpense = async (
     return
   }
 
-    const body = {
+  const body = {
     from_asset_id,
     to_asset_id: null,
     transaction_type,
@@ -96,7 +96,6 @@ export const addTransactionExpense = async (
     notes: notes || null,
     image: null,
   }
-
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
@@ -162,23 +161,23 @@ export const addTransactionTransfer = async (
   notes: string,
 ) => {
   const body = {
-      from_asset_id,
-      to_asset_id,
-      transaction_type,
-      amount: balance,
-      fee,
-      from_account_id,
-      to_account_id,
-      transaction_time,
-      notes: notes || null,
-      image: null,
-    }
+    from_asset_id,
+    to_asset_id,
+    transaction_type,
+    amount: balance,
+    fee,
+    from_account_id,
+    to_account_id,
+    transaction_time,
+    notes: notes || null,
+    image: null,
+  }
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
     console.log(`[POST] ${API_BASE_URL} (Transfer) →`, response.data)
     return response
-  }  catch (error) {
+  } catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }

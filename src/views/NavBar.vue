@@ -6,11 +6,11 @@
       <router-link to="/" class="logo">Homepage</router-link>
 
       <!-- Authenticated user-only links -->
-      <router-link v-if="authStore.user" to="/asset" class="nav-link">Asset</router-link>
-      <router-link v-if="authStore.user" to="/transaction" class="nav-link"
+      <router-link v-if="authStore.userId" to="/asset" class="nav-link">Asset</router-link>
+      <router-link v-if="authStore.userId" to="/transaction" class="nav-link"
         >Transaction</router-link
       >
-      <router-link v-if="authStore.user" to="/stock" class="nav-link">Stock</router-link>
+      <router-link v-if="authStore.userId" to="/stock" class="nav-link">Stock</router-link>
     </div>
 
     <!-- Right-aligned dropdown for account-related actions -->
@@ -20,14 +20,16 @@
       <!-- Dropdown menu shows/hides based on `dropdownVisible` -->
       <div v-show="dropdownVisible" class="dropdown">
         <!-- Guest-only links -->
-        <router-link v-if="!authStore.user" to="/register" class="dropdown-item"
+        <router-link v-if="!authStore.userId" to="/register" class="dropdown-item"
           >Register</router-link
         >
-        <router-link v-if="!authStore.user" to="/login" class="dropdown-item">Login</router-link>
+        <router-link v-if="!authStore.userId" to="/login" class="dropdown-item">Login</router-link>
 
         <!-- Logged-in user links -->
-        <button v-if="authStore.user" @click="handleLogout" class="dropdown-item">Logout</button>
-        <router-link v-if="authStore.user" to="/setting" class="dropdown-item">Setting</router-link>
+        <button v-if="authStore.userId" @click="handleLogout" class="dropdown-item">Logout</button>
+        <router-link v-if="authStore.userId" to="/setting" class="dropdown-item"
+          >Setting</router-link
+        >
       </div>
     </div>
   </nav>
@@ -35,8 +37,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth' // Pinia store for auth state
-import { useRouter } from 'vue-router' // Router for navigation
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 // Access auth state and routing
 const authStore = useAuthStore()
