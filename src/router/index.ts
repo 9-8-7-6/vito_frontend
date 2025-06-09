@@ -36,26 +36,21 @@ const router = createRouter({
 
 // Navigation guard to check auth before each route
 router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore()
-
-  // Run authentication check (e.g., validate session/cookie)
   const isAuthenticated = await AuthCheck()
-  console.log('isAuthenticated', isAuthenticated)
 
-  // If route requires auth and user is not authenticated → redirect to login
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    console.log('User not authenticated, redirecting to /login')
-    next('/login')
-
-    // If user is authenticated and trying to access /login or /register → redirect to home
-  } else if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
-    console.log('User is authenticated, redirecting to /')
-    next('/')
-
-    // Otherwise, allow navigation
-  } else {
-    next()
+  if (to.path === '/login' || to.path === '/register') {
+    if (isAuthenticated) {
+      return next('/')
+    } else {
+      return next()
+    }
   }
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return { path: '/login' }
+  }
+
+  return true
 })
 
 export default router
