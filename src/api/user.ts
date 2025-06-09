@@ -2,7 +2,6 @@ import axios from 'axios'
 import { formatFieldDate } from '../utils/format'
 import { getCookie } from 'typescript-cookie'
 
-
 // Define the base URL for user-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`
 

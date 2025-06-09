@@ -59,7 +59,6 @@ import { fetchCountries } from '../api/countries'
 import { getUserData, updateUserData } from '../api/user'
 import { getCookie, setCookie } from 'typescript-cookie'
 
-
 // Reactive states
 const user = ref(null)
 const countries = ref([])

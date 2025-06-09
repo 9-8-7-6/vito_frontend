@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { getCookie } from 'typescript-cookie'
 
-
 // Base URL for stock holding API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holding`
 

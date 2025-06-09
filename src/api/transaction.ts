@@ -2,7 +2,6 @@ import axios from 'axios'
 import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 import { formatFieldDate } from '../utils/format'
 
-
 // Base URL for transaction-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
 

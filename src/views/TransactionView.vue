@@ -278,7 +278,6 @@ import {
 import { getAsset } from '../api/asset'
 import { getCookie, setCookie } from 'typescript-cookie'
 
-
 // === UI State ===
 const showForm = ref(false)
 const showIncome = ref(false)
@@ -309,9 +308,7 @@ const editedTypeValue = ref('')
 
 // === Pagination ===
 const currentPage = ref(1)
-const itemsPerPage = ref(
-  parseInt(getCookie('itemsPerPage') || '10', 10)
-)
+const itemsPerPage = ref(parseInt(getCookie('itemsPerPage') || '10', 10))
 
 // Save pagination preference to cookie
 watch(itemsPerPage, (newVal) => {

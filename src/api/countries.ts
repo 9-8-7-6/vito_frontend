@@ -4,7 +4,6 @@ import { getCookie } from 'typescript-cookie'
 // Define the base URL for the countries API endpoint
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/countries`
 
-
 /**
  * Utility function to retrieve the user ID from cookie.
  * @returns The user's ID as a string, or null if not found or invalid.
