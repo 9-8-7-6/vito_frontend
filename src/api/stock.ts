@@ -1,33 +1,21 @@
 import axios from 'axios'
-import { getCookie } from 'typescript-cookie'
+import type { AxiosResponse } from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 // Base URL for stock holding API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stock-holding`
 
 /**
- * Utility function to get the logged-in user's ID from cookie.
- * Returns null if not found or invalid.
- */
-const getUserId = (): string | null => {
-  const user = getCookie('user')
-  if (!user) return null
-
-  try {
-    return JSON.parse(user).id
-  } catch {
-    console.error('Invalid user data in cookie')
-    return null
-  }
-}
-
-/**
  * Fetch all stock holdings for the current user (by account ID).
  */
 export const fetchStockHoldingsByAccount = async () => {
-  const accountId = getUserId()
-  if (!accountId) return
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('fetchStockHoldingsByAccount: no userId in store, 無法取得持股資料')
+    return
+  }
 
-  const url = `${API_BASE_URL}/account/${accountId}`
+  const url = `${API_BASE_URL}/account/${authStore.userId}`
   try {
     const response = await axios.get(url)
     console.log(`[GET] ${url} - Stock holdings:`, response)
@@ -50,11 +38,14 @@ export const createStockHolding = async (
   averagePrice: number,
   country: string,
 ) => {
-  const accountId = getUserId()
-  if (!accountId) return
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('createStockHolding: no userId in store，無法建立持股')
+    return
+  }
 
   const payload = {
-    account_id: accountId,
+    account_id: authStore.userId,
     country,
     ticker_symbol: tickerSymbol,
     quantity,

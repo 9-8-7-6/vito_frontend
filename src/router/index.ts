@@ -11,7 +11,6 @@ import Setting from '../views/SettingVuew.vue'
 import Transaction from '../views/TransactionView.vue'
 
 import { useAuthStore } from '@/stores/auth'
-import { removeCookie } from 'typescript-cookie'
 
 // Define all routes in the application
 const routes = [
@@ -42,11 +41,6 @@ router.beforeEach(async (to, from, next) => {
   // Run authentication check (e.g., validate session/cookie)
   const isAuthenticated = await AuthCheck()
   console.log('isAuthenticated', isAuthenticated)
-
-  // If not authenticated, clear local state and storage
-  if (!isAuthenticated) {
-    removeCookie('id', { path: '/' })
-  }
 
   // If route requires auth and user is not authenticated → redirect to login
   if (to.meta.requiresAuth && !isAuthenticated) {

@@ -1,40 +1,34 @@
 import axios from 'axios'
 import { formatFieldDate } from '../utils/format'
-import { getCookie } from 'typescript-cookie'
+import { useAuthStore } from '@/stores/auth'
+import type { AxiosResponse } from 'axios'
 
 // Define the base API URL for asset-related requests
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/assets`
 
 /**
  * Fetches all assets for the currently logged-in user.
- * It retrieves the user ID from Cookie, then sends a GET request.
+ * It retrieves the user ID from useAuthStore, then sends a GET request.
  * The response is formatted by converting 'updated_at' fields to readable format.
  */
-export const getAsset = async () => {
-  const userData = getCookie('user')
-
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+export const getAsset = async (): Promise<AxiosResponse<any> | void> => {
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('getAsset: no userId in store, failed to get user`s asset')
     return
   }
 
+  const url = `${API_BASE_URL}/${authStore.userId}`
   try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = `${API_BASE_URL}/${parsedUser.id}`
-    const response = await axios.get(url)
-
-    if (response && response.data) {
-      const formattedData = formatFieldDate(response.data, 'updated_at')
-      return { ...response, data: formattedData }
+    const response: AxiosResponse<any> = await axios.get(url)
+    if (response.data) {
+      const formatted = formatFieldDate(response.data, 'updated_at')
+      return { ...response, data: formatted }
     }
-
-    console.log(
-      `Sending GET request to url ${url} for ${parsedUser.id} asset, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`GET ${url} →`, JSON.stringify(response.data, null, 2))
     return response
-  } catch (error) {
-    console.error('Failed to parse user data or send request:', error)
+  } catch (err: any) {
+    console.error('getAsset failed:', err.response?.data ?? err.message)
   }
 }
 
@@ -43,31 +37,23 @@ export const getAsset = async () => {
  * Sends a POST request with asset_type and balance.
  */
 export const addAsset = async (asset_type: string, balance: number) => {
-  const userData = getCookie('user')
-
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('addAsset: no userId in store，failed to add asset')
     return
+  }
+  const body = {
+    account_id: authStore.userId,
+    asset_type,
+    balance,
   }
 
   try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = API_BASE_URL
-    const body = {
-      account_id: parsedUser.id,
-      asset_type: asset_type,
-      balance: balance,
-    }
-
-    const response = await axios.post(url, body)
-
-    console.log(
-      `Sending POST request to url ${url} for ${parsedUser.id} asset, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
+    console.log(`POST ${API_BASE_URL} →`, JSON.stringify(response.data, null, 2))
     return response
-  } catch (error) {
-    console.error('Failed to parse user data or send request:', error)
+  } catch (err: any) {
+    console.error('addAsset fail', err.response?.data ?? err.message)
   }
 }
 
@@ -75,18 +61,14 @@ export const addAsset = async (asset_type: string, balance: number) => {
  * Deletes a specific asset by asset_id.
  * Sends a DELETE request to the backend.
  */
-export const deleteAsset = async (asset_id: string) => {
+export const deleteAsset = async (asset_id: string): Promise<AxiosResponse<any> | void> => {
+  const url = `${API_BASE_URL}/${asset_id}`
   try {
-    const url = `${API_BASE_URL}/${asset_id}`
-    const response = await axios.delete(url)
-
-    console.log(
-      `Sending DELETE request to url ${url} for ${asset_id} asset, response: ${JSON.stringify(response, null, 2)}`,
-    )
-
+    const response: AxiosResponse<any> = await axios.delete(url)
+    console.log(`DELETE ${url} →`, JSON.stringify(response.data, null, 2))
     return response
-  } catch (error) {
-    console.error('Failed to parse user data or send request:', error)
+  } catch (err: any) {
+    console.error('deleteAsset failed:', err.response?.data ?? err.message)
   }
 }
 
@@ -94,17 +76,16 @@ export const deleteAsset = async (asset_id: string) => {
  * Updates an existing asset by asset_id with the given fields.
  * Sends a PATCH request containing only fields that need to be updated.
  */
-export const updateAsset = async (asset_id: string, fieldsToUpdate: Record<string, any>) => {
+export const updateAsset = async (
+  asset_id: string,
+  fieldsToUpdate: Record<string, any>,
+): Promise<AxiosResponse<any> | void> => {
+  const url = `${API_BASE_URL}/${asset_id}`
   try {
-    const url = `${API_BASE_URL}/${asset_id}`
-    const response = await axios.patch(url, fieldsToUpdate)
-
-    console.log(
-      `Sending PATCH request to url ${url} for ${asset_id} asset, response: ${JSON.stringify(response, null, 2)}`,
-    )
-
+    const response: AxiosResponse<any> = await axios.patch(url, fieldsToUpdate)
+    console.log(`PATCH ${url} →`, JSON.stringify(response.data, null, 2))
     return response
-  } catch (error) {
-    console.error('Failed to parse user data or send request:', error)
+  } catch (err: any) {
+    console.error('updateAsset failed:', err.response?.data ?? err.message)
   }
 }

@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
 import { formatFieldDate } from '../utils/format'
+import type { AxiosResponse } from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 // Base URL for transaction-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
@@ -9,28 +10,20 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/transactions`
  * Fetch all transactions for the current user from cookie.
  */
 export const getTransactionsByUserId = async () => {
-  const userData = getCookie('user')
-
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('getTransactionsByUserId: no userId in store，無法取得交易資料')
     return
   }
 
+  const url = `${API_BASE_URL}/account/${authStore.userId}`
   try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = `${API_BASE_URL}/account/${parsedUser.id}`
-    const response = await axios.get(url)
-
-    if (response && response.data) {
-      // Format transaction_time field before returning
-      const formattedData = formatFieldDate(response.data, 'transaction_time')
-      return { ...response, data: formattedData }
+    const response: AxiosResponse<any> = await axios.get(url)
+    if (response.data) {
+      const formatted = formatFieldDate(response.data, 'transaction_time')
+      return { ...response, data: formatted }
     }
-
-    console.log(
-      `Sending GET request to url ${url} for ${parsedUser.id} transaction, response is ${JSON.stringify(response, null, 2)}`,
-    )
-
+    console.log(`[GET] ${url} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -47,30 +40,28 @@ export const addTransactionIncome = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = getCookie('user')
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('addTransactionIncome: no userId in store，無法新增收入交易')
     return
   }
 
-  try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = API_BASE_URL
-    const body = {
-      from_asset_id: null,
-      to_asset_id,
-      transaction_type,
-      amount,
-      fee: 0,
-      from_account_id: null,
-      to_account_id: parsedUser.id,
-      transaction_time: transaction_time || null,
-      notes: notes || null,
-      image: null,
-    }
+  const body = {
+    from_asset_id: null,
+    to_asset_id,
+    transaction_type,
+    amount,
+    fee: 0,
+    from_account_id: null,
+    to_account_id: authStore.userId,
+    transaction_time: transaction_time || null,
+    notes: notes || null,
+    image: null,
+  }
 
-    const response = await axios.post(url, body)
-    console.log(`[POST] Income transaction sent:`, response)
+  try {
+    const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
+    console.log(`[POST] ${API_BASE_URL} (Income) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -87,30 +78,29 @@ export const addTransactionExpense = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = getCookie('user')
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('addTransactionExpense: no userId in store，無法新增支出交易')
     return
   }
 
-  try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = API_BASE_URL
     const body = {
-      from_asset_id,
-      to_asset_id: null,
-      transaction_type,
-      amount,
-      fee: 0,
-      from_account_id: parsedUser.id,
-      to_account_id: null,
-      transaction_time: transaction_time || null,
-      notes: notes || null,
-      image: null,
-    }
+    from_asset_id,
+    to_asset_id: null,
+    transaction_type,
+    amount,
+    fee: 0,
+    from_account_id: authStore.userId,
+    to_account_id: null,
+    transaction_time: transaction_time || null,
+    notes: notes || null,
+    image: null,
+  }
 
-    const response = await axios.post(url, body)
-    console.log(`[POST] Expense transaction sent:`, response)
+
+  try {
+    const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
+    console.log(`[POST] ${API_BASE_URL} (Expense) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -129,30 +119,28 @@ export const addTransactionInternalTransfer = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = getCookie('user')
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  const authStore = useAuthStore()
+  if (!authStore.userId) {
+    console.error('addTransactionInternalTransfer: no userId in store，無法新增內部轉帳交易')
     return
   }
 
-  try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = API_BASE_URL
-    const body = {
-      from_asset_id,
-      to_asset_id,
-      transaction_type,
-      amount: balance,
-      fee,
-      from_account_id: parsedUser.id,
-      to_account_id: parsedUser.id,
-      transaction_time,
-      notes: notes || null,
-      image: null,
-    }
+  const body = {
+    from_asset_id,
+    to_asset_id,
+    transaction_type,
+    amount: balance,
+    fee,
+    from_account_id: authStore.userId,
+    to_account_id: authStore.userId,
+    transaction_time: transaction_time || null,
+    notes: notes || null,
+    image: null,
+  }
 
-    const response = await axios.post(url, body)
-    console.log(`[POST] Internal transfer transaction sent:`, response)
+  try {
+    const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
+    console.log(`[POST] ${API_BASE_URL} (InternalTransfer) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -173,16 +161,7 @@ export const addTransactionTransfer = async (
   transaction_time: string,
   notes: string,
 ) => {
-  const userData = getCookie('user')
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
-    return
-  }
-
-  try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = API_BASE_URL
-    const body = {
+  const body = {
       from_asset_id,
       to_asset_id,
       transaction_type,
@@ -195,10 +174,11 @@ export const addTransactionTransfer = async (
       image: null,
     }
 
-    const response = await axios.post(url, body)
-    console.log(`[POST] Inter-account transfer transaction sent:`, response)
+  try {
+    const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
+    console.log(`[POST] ${API_BASE_URL} (Transfer) →`, response.data)
     return response
-  } catch (error) {
+  }  catch (error) {
     console.error('Failed to parse user data or send request:', error)
   }
 }

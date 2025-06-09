@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { setCookie, getCookie, removeCookie } from 'typescript-cookie'
+import type { AxiosResponse } from 'axios'
 
 // Base URL for the backend API, pulled from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -21,17 +21,10 @@ export interface Credentials {
  * Registers a new user by sending a POST request to /register.
  * @param userData - Contains username, email, and password.
  */
-export const registerUser = async (userData: RegisterData) => {
+export const registerUser = async (userData: RegisterData): Promise<AxiosResponse<any>> => {
   const url = `${API_BASE_URL}/register`
-  console.log(`Sending register request to`, url)
-  try {
-    return axios.post(url, userData)
-  } catch (error: any) {
-    const errMessage =
-      error.response?.data?.message || error.message || 'Unknown Error during registration'
-    console.error('Register failed:', errMessage)
-    throw new Error(errMessage)
-  }
+  const response = await axios.post(url, userData)
+  return response
 }
 
 /**
@@ -39,73 +32,38 @@ export const registerUser = async (userData: RegisterData) => {
  * Automatically handles session cookie if login is successful.
  * @param credentials - Contains username and password.
  */
-export const loginUser = async (credentials: Credentials) => {
+export const loginUser = async (credentials: Credentials): Promise<AxiosResponse<any>> => {
   const url = `${API_BASE_URL}/login`
-  console.log(`Sending login request to`, url, `body is`, credentials)
-
-  try {
-    const response = await axios.post(url, credentials, { withCredentials: true })
-    console.log(`Response of login request is`, response)
-
-    // Server should respond with a success status
-    if (response.data.status !== 'success') {
-      throw new Error(response.data.message || 'Login failed on server')
-    }
-
-    return response
-  } catch (error: any) {
-    const errMessage =
-      error.response?.data?.message || error.message || 'Unknown Error during login'
-    console.error('Login failed:', errMessage)
-    throw new Error(errMessage)
+  const response = await axios.post(url, credentials)
+  if (response.data.status !== 'success') {
+    throw new Error(response.data.message || 'Login failed on server')
   }
+  return response
 }
 
 /**
  * Logs out the current user by calling the /logout endpoint.
  * Also removes session cookie 'id' if the response contains a token.
  */
-export const logoutUser = async () => {
+export const logoutUser = async (): Promise<AxiosResponse<any>> => {
   const url = `${API_BASE_URL}/logout`
-  console.log(`Sending logout request to`, url)
-
-  try {
-    const response = await axios.post(
-      url,
-      {},
-      {
-        withCredentials: true,
-      },
-    )
-
-    // Cleanup client-side cookie if the backend indicates logout success
-    if (response.data && response.data.token) {
-      console.log('Logout successful, cleaning cookie')
-      removeCookie('id', { path: '/' })
-    }
-
-    return response
-  } catch (error) {
-    let errorMessage = 'Failed to perform logout'
-    if (error instanceof Error) {
-      errorMessage = error.message
-    }
-    console.log(errorMessage)
+  const response = await axios.post(url)
+  if (response.data.status !== 'success') {
+    throw new Error(response.data.message || 'Logout failed on server')
   }
+  return response
 }
 
 /**
  * Checks if the current user session is valid by calling /auth/check.
  * Returns `true` if session is valid, otherwise `false`.
  */
-export const AuthCheck = async () => {
+export const AuthCheck = async (): Promise<boolean> => {
   const url = `${API_BASE_URL}/auth/check`
-
   try {
-    const response = await axios.post(`${url}`, {}, { withCredentials: true })
+    const response = await axios.post(url, {})
     return response.status === 200
-  } catch (error) {
-    console.error('Auth check failed:', error)
+  } catch {
     return false
   }
 }

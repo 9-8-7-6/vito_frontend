@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { formatFieldDate } from '../utils/format'
-import { getCookie } from 'typescript-cookie'
+import { useAuthStore } from '@/stores/auth'
+import type { AxiosResponse } from 'axios'
 
 // Define the base URL for user-related API endpoints
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`
@@ -14,21 +14,20 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`
  * - Logs and returns the server response
  */
 export const getUserData = async () => {
-  const userData = getCookie('user')
+  const authStore = useAuthStore()
 
-  if (!userData) {
-    console.error("No 'user' data found in cookie")
+  if (!authStore.userId) {
+    console.error('No userId in store')
     return
   }
 
   try {
-    const parsedUser: { id: string } = JSON.parse(userData)
-    const url = `${API_BASE_URL}/${parsedUser.id}`
-    const response = await axios.get(url)
+    const url = `${API_BASE_URL}/${authStore.userId}`
+    const response: AxiosResponse<any> = await axios.get(url, {
+      withCredentials: true,
+    })
 
-    console.log(
-      `Sending GET request to url ${url} for ${parsedUser.id} user, response is ${JSON.stringify(response, null, 2)}`,
-    )
+    console.log(`GET ${url} → `, JSON.stringify(response.data, null, 2))
 
     return response
   } catch (error) {
