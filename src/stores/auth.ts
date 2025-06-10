@@ -12,11 +12,7 @@ interface Credentials {
 interface LoginResult {
   status: string
   message: string
-  user: {
-    id: string
-    username: string
-    email: string
-  }
+  uuid: string
 }
 
 // Create a Pinia store named 'auth'
@@ -28,7 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials: Credentials) => {
     try {
       const resp: AxiosResponse<LoginResult> = await loginUser(credentials)
-      userId.value = resp.data.user.id
+      userId.value = resp.data.uuid
       return true
     } catch (err) {
       console.error('Login failed:', err)

@@ -7,7 +7,7 @@ import Login from '../views/LoginView.vue'
 import Register from '../views/RegisterView.vue'
 import Asset from '../views/AssetView.vue'
 import Stock from '../views/StockView.vue'
-import Setting from '../views/SettingVuew.vue'
+import Setting from '../views/SettingView.vue'
 import Transaction from '../views/TransactionView.vue'
 
 import { useAuthStore } from '@/stores/auth'
@@ -35,15 +35,10 @@ const router = createRouter({
 })
 
 // Navigation guard to check auth before each route
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   const isAuthenticated = await AuthCheck()
-
-  if (to.path === '/login' || to.path === '/register') {
-    if (isAuthenticated) {
-      return next('/')
-    } else {
-      return next()
-    }
+  if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
+    return { path: '/' }
   }
 
   if (to.meta.requiresAuth && !isAuthenticated) {
