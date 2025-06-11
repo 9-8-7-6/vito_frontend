@@ -405,7 +405,7 @@ const createTransactionIncome = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
-      window.location.reload() // Reload to reflect new transaction
+      await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
     }
@@ -443,7 +443,7 @@ const createTransactionExpense = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
-      window.location.reload()
+      await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
     }
@@ -486,7 +486,7 @@ const createTransactionInternalTransfer = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
-      window.location.reload()
+      await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
     }
@@ -500,7 +500,7 @@ const createTransactionInternalTransfer = async () => {
 const handleDeleteTransaction = async (transaction_id) => {
   try {
     const response = await deleteTransaction(transaction_id)
-    window.location.reload()
+    await fetchTransactions()
   } catch (error) {
     console.error('Error deleting transaction:', error)
   }
@@ -536,7 +536,7 @@ const handleUpdateTransaction = async (transaction_id, field, value) => {
   try {
     const updatedFields = {}
     await updateTransaction(transaction_id, updatedFields)
-    window.location.reload()
+    await fetchTransactions()
   } catch (error) {
     console.error('Error updating transaction:', error)
   }

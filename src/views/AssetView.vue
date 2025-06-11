@@ -164,7 +164,7 @@ const createAsset = async () => {
 const handleDeleteAsset = async (asset_id) => {
   try {
     await deleteAsset(asset_id)
-    window.location.reload() // reload to update list
+    await fetchAssets()
   } catch (error) {
     console.error('Error deleting asset:', error)
   }
@@ -186,7 +186,7 @@ const handleUpdateAsset = async (asset_id, asset_type) => {
   try {
     const updatedFields = { balance: parseFloat(editedValue.value) }
     const response = await updateAsset(asset_id, updatedFields)
-    if (response) window.location.reload()
+    await fetchAssets()
   } catch (error) {
     console.error('Error updating asset balance:', error)
   } finally {
@@ -214,7 +214,7 @@ const handleUpdateAssetType = async (asset_id, balance) => {
   try {
     const updatedFields = { asset_type: editedTypeValue.value }
     const response = await updateAsset(asset_id, updatedFields)
-    if (response) window.location.reload()
+    await fetchAssets()
   } catch (error) {
     console.error('Error updating asset type:', error)
   } finally {
