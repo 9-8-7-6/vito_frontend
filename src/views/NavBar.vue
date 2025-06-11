@@ -54,7 +54,6 @@ const toggleDropdown = () => {
 const handleLogout = () => {
   authStore.logout() // Clear user state in Pinia
   router.push('/login') // Redirect to login page
-  window.location.reload() // Force page reload to clear session state
   dropdownVisible.value = false
 }
 </script>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { loginUser, logoutUser } from '../api/auth'
 import type { AxiosResponse } from 'axios'
 
@@ -18,7 +18,15 @@ interface LoginResult {
 // Create a Pinia store named 'auth'
 export const useAuthStore = defineStore('auth', () => {
   // Reactive user state initialized from cookie (if available)
-  const userId = ref<string | null>(null)
+  const userId = ref<string | null>(localStorage.getItem('userId'))
+
+  watch(userId, (newVal) => {
+    if (newVal) {
+      localStorage.setItem('userId', newVal)
+    } else {
+      localStorage.removeItem('userId')
+    }
+  })
 
   // Login function: attempts login, stores user data if successful
   const login = async (credentials: Credentials) => {
@@ -35,8 +43,8 @@ export const useAuthStore = defineStore('auth', () => {
   // Logout function: clears user session and cookie
   const logout = async () => {
     try {
-      await logoutUser()
       userId.value = null
+      await logoutUser()
       return true
     } catch (err) {
       console.error('Logout failed:', err)
