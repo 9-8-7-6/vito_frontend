@@ -616,7 +616,7 @@ table {
 .table-container table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
+
   table-layout: fixed;
 }
 

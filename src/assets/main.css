@@ -1,9 +1,13 @@
 @import './base.css';
 
+:root {
+  --navbar-height: 60px;
+}
+
 #app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: calc(2rem + var(--navbar-height)) 2rem 2rem;
   font-weight: normal;
 }
 
@@ -31,5 +35,52 @@ a,
     display: grid;
     grid-template-columns: auto;
     padding: 0 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 80px;
+  }
+
+  #app {
+    padding: calc(1rem + var(--navbar-height)) 1rem 1rem;
+  }
+
+  .navbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .navbar a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+  .table-container table {
+    width: auto;
+    min-width: 100%;
+  }
+  th,
+  td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .pagination,
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

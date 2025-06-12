@@ -1,51 +1,72 @@
 <template>
-  <nav class="navbar">
+  <nav ref="navRef" class="navbar">
     <!-- Left-aligned navigation links -->
     <div class="left-links">
       <!-- Always show homepage -->
       <router-link to="/" class="logo">Homepage</router-link>
-
-      <!-- Authenticated user-only links -->
-      <router-link v-if="authStore.userId" to="/asset" class="nav-link">Asset</router-link>
-      <router-link v-if="authStore.userId" to="/transaction" class="nav-link"
-        >Transaction</router-link
-      >
-      <router-link v-if="authStore.userId" to="/stock" class="nav-link">Stock</router-link>
     </div>
 
     <!-- Right-aligned dropdown for account-related actions -->
     <div class="nav-menu">
+      <!-- Authenticated user-only links -->
+      <button @click="toggleResource" class="menu-button">☰</button>
+      <div v-show="showResources" class="dropdown resources">
+        <router-link to="/asset" class="dropdown-item" @click="showResources = false">
+          Asset
+        </router-link>
+        <router-link to="/transaction" class="dropdown-item" @click="showResources = false">
+          Transaction
+        </router-link>
+        <router-link to="/stock" class="dropdown-item" @click="showResources = false">
+          Stock
+        </router-link>
+      </div>
+
+      <!-- Account toggle -->
       <button @click="toggleDropdown" class="menu-button">Account</button>
-
-      <!-- Dropdown menu shows/hides based on `dropdownVisible` -->
       <div v-show="dropdownVisible" class="dropdown">
-        <!-- Guest-only links -->
-        <router-link v-if="!authStore.userId" to="/register" class="dropdown-item"
-          >Register</router-link
+        <router-link
+          v-if="!authStore.userId"
+          to="/register"
+          class="dropdown-item"
+          @click="dropdownVisible = false"
         >
-        <router-link v-if="!authStore.userId" to="/login" class="dropdown-item">Login</router-link>
-
-        <!-- Logged-in user links -->
+          Register
+        </router-link>
+        <router-link
+          v-if="!authStore.userId"
+          to="/login"
+          class="dropdown-item"
+          @click="dropdownVisible = false"
+        >
+          Login
+        </router-link>
         <button v-if="authStore.userId" @click="handleLogout" class="dropdown-item">Logout</button>
-        <router-link v-if="authStore.userId" to="/setting" class="dropdown-item"
-          >Setting</router-link
+        <router-link
+          v-if="authStore.userId"
+          to="/setting"
+          class="dropdown-item"
+          @click="dropdownVisible = false"
         >
+          Setting
+        </router-link>
       </div>
     </div>
   </nav>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
 // Access auth state and routing
 const authStore = useAuthStore()
 const router = useRouter()
-
-// Dropdown menu visibility toggle
+const showResources = ref(false)
 const dropdownVisible = ref(false)
+const navRef = ref<HTMLElement | null>(null)
+
 const toggleDropdown = () => {
   dropdownVisible.value = !dropdownVisible.value
 }
@@ -56,6 +77,24 @@ const handleLogout = () => {
   router.push('/login') // Redirect to login page
   dropdownVisible.value = false
 }
+
+function toggleResource() {
+  showResources.value = !showResources.value
+}
+
+function handleClickOutside(e: MouseEvent) {
+  if (navRef.value && !navRef.value.contains(e.target as Node)) {
+    showResources.value = false
+    dropdownVisible.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -110,14 +149,12 @@ const handleLogout = () => {
 }
 
 .menu-button {
-  background-color: #444;
+  background: #444;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 16px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
   color: #fff;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .menu-button:hover {
@@ -138,19 +175,55 @@ const handleLogout = () => {
 }
 
 .dropdown-item {
-  padding: 8px 12px;
-  text-decoration: none;
+  padding: 0.5rem 0.75rem;
   color: #333;
-  border: none;
-  background: none;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 2px 0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 0.2s;
 }
 
 .dropdown-item:hover {
   background-color: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .left-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+  }
+  .left-links .logo,
+  .left-links .nav-link {
+    flex: 1 1 48%;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .nav-menu {
+    width: 100%;
+  }
+  .menu-button {
+    width: 100%;
+  }
+
+  .dropdown {
+    position: sticky;
+    width: 100%;
+    box-shadow: none;
+    margin-top: 8px;
+    border-radius: 4px;
+  }
+  .dropdown-item {
+    padding: 12px;
+    text-align: center;
+  }
 }
 </style>
