@@ -69,6 +69,9 @@ const navRef = ref<HTMLElement | null>(null)
 
 const toggleDropdown = () => {
   dropdownVisible.value = !dropdownVisible.value
+  if (dropdownVisible.value) {
+    showResources.value = false
+  }
 }
 
 // Logout handler
@@ -80,6 +83,9 @@ const handleLogout = () => {
 
 function toggleResource() {
   showResources.value = !showResources.value
+  if (showResources.value) {
+    dropdownVisible.value = false
+  }
 }
 
 function handleClickOutside(e: MouseEvent) {
