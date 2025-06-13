@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { AuthCheck } from '../api/auth.ts'
 
 // Import views (page components)
@@ -30,7 +30,7 @@ const routes = [
 
 // Create the router instance with history mode
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 })
 

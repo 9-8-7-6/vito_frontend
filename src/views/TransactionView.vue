@@ -4,12 +4,12 @@
     <!-- Container for the transaction table and filters -->
     <div class="table-container">
       <!-- Buttons to filter transactions by type -->
-      <div class="filter-transaction-type">
+      <!-- <div class="filter-transaction-type">
         <button @click="filterType = 'All'">All</button>
         <button @click="filterType = 'Income'">Income</button>
         <button @click="filterType = 'Expense'">Expense</button>
         <button @click="filterType = 'InternalTransfer'">Internal Transfer</button>
-      </div>
+      </div> -->
 
       <!-- Table to display paginated transactions -->
       <table>
@@ -598,6 +598,15 @@ onMounted(async () => {
   min-height: 100vh;
 }
 
+/* === filter buttons === */
+.filter-transaction-type {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -616,20 +625,17 @@ table {
 .table-container table {
   width: 100%;
   border-collapse: collapse;
-
   table-layout: fixed;
 }
 
 .table-container thead {
+  position: sticky;
   top: 0;
   background-color: #333;
   z-index: 10;
 }
 
-label {
-  font-size: 16px;
-  margin-bottom: 5px;
-}
+/* === inputs & selects === */
 input,
 select {
   width: 250px;
@@ -639,6 +645,7 @@ select {
   border-radius: 5px;
   background-color: #333;
   color: white;
+  box-sizing: border-box;
 }
 
 option {
@@ -646,6 +653,7 @@ option {
   color: #ccc;
 }
 
+/* === buttons === */
 button {
   padding: 10px 20px;
   border: none;
@@ -657,10 +665,6 @@ button {
   transition: background-color 0.3s;
 }
 
-.create-transaction-button {
-  margin-top: 20px;
-}
-
 button:hover {
   background-color: #0056b3;
 }
@@ -669,75 +673,16 @@ th,
 td {
   border: 1px solid #444;
   padding: 10px;
-}
-
-th {
-  background-color: #333;
-  color: white;
-}
-
-td {
   text-align: center;
+  font-size: 1rem;
 }
 
-.action-button {
-  background-color: #d9534f;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-
-.action-button:hover {
-  background-color: #c9302c;
-}
-
-.transaction-type-button,
-.transaction-type-input {
-  min-width: 100px;
+.create-transaction-button {
+  margin-top: 20px;
   width: auto;
-  padding: 8px 12px;
-  text-align: center;
 }
 
-.transaction-type-input {
-  border: 1px solid #444;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
-}
-
-.transaction-form {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto 20px auto;
-  gap: 10px;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.cancel-button {
-  background-color: #d9534f;
-  padding: 10px 20px;
-  border-radius: 5px;
-  color: white;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.cancel-button:hover {
-  background-color: #c9302c;
-}
-
+/* === pagination === */
 .pagination {
   display: flex;
   align-items: center;
@@ -747,12 +692,7 @@ td {
 
 .pagination button {
   padding: 5px 10px;
-  border: none;
   border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .pagination button:disabled {
@@ -767,15 +707,29 @@ td {
   width: 60px;
 }
 
+/* === delete button === */
+.action-button {
+  background-color: #d9534f;
+  padding: 5px 10px;
+}
+.action-button:hover {
+  background-color: #c9302c;
+}
+
+/* === forms === */
+.transaction-form {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 20px;
+}
+
 .create-transaction-form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  margin: 0 auto 20px auto;
   gap: 10px;
-  padding: 20px;
-  border-radius: 10px;
+  margin-bottom: 20px;
 }
 
 .create-transaction-form-wrapper {
@@ -783,7 +737,6 @@ td {
   background-color: #2e2e2e;
   border-radius: 8px;
   padding: 20px;
-  margin-bottom: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -805,70 +758,96 @@ td {
   color: #fff;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  background-color: #333;
-  color: #ccc;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
 .form-group input:focus {
   border-color: #007bff;
 }
 
-.create-transaction-form-wrapper button {
-  margin-right: 10px;
-  margin-top: 10px;
-}
-
 .cancel-button {
   background-color: #d9534f;
+  margin-top: 10px;
 }
-
 .cancel-button:hover {
   background-color: #c9302c;
 }
 
-.filter-transaction-type {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.filter-transaction-type button {
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: 1px solid #444;
-  background-color: #333;
-  color: #fff;
+/* === amount display coloring === */
+.amount-display.Income {
+  color: #00bfff;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
-
-.filter-transaction-type button:hover {
-  background-color: #444;
+.amount-display.Expense {
+  color: #ff4d4f;
+  font-weight: bold;
+  cursor: pointer;
 }
-
-.amount-display {
+.amount-display.InternalTransfer {
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
 }
 
-.amount-display.Income {
-  color: #00bfff;
-}
+/* ============== MOBILE (<=768px) ============== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
 
-.amount-display.Expense {
-  color: #ff4d4f;
-}
+  /* filter buttons stack */
+  .filter-transaction-type {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .filter-transaction-type button {
+    flex: 1 1 48%;
+    font-size: 0.9rem;
+  }
 
-.amount-display.InternalTransfer {
-  color: white;
+  /* table becomes horizontally scrollable */
+  .table-container {
+    overflow-x: auto;
+  }
+  .table-container table {
+    width: auto;
+    min-width: 100%;
+  }
+  th,
+  td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  /* pagination stacks */
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pagination button,
+  .pagination input,
+  .pagination select {
+    width: 100%;
+  }
+
+  /* create button full width */
+  .create-transaction-button {
+    width: 100%;
+  }
+
+  /* transaction type toggle buttons full width */
+  .transaction-form button {
+    flex: 1 1 48%;
+    width: auto;
+  }
+
+  /* form wrappers adapt */
+  .create-transaction-form-wrapper {
+    width: 100%;
+    padding: 15px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    width: 100%;
+  }
 }
 </style>

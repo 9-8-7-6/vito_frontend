@@ -33,3 +33,6 @@ coverage
 
 logs/
 tests_output/
+
+.env.development
+.env.production
