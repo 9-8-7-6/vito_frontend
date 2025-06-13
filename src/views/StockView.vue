@@ -36,10 +36,14 @@
                 :class="{
                   profit:
                     item.current_price &&
-                    item.quantity * item.current_price - item.quantity * item.average_price >= 0,
+                    item.quantity * item.current_price * 0.995575 -
+                      item.quantity * item.average_price * 1.001425 >=
+                      0,
                   loss:
                     item.current_price &&
-                    item.quantity * item.current_price - item.quantity * item.average_price < 0,
+                    item.quantity * item.current_price * 0.995575 -
+                      item.quantity * item.average_price * 1.001425 <
+                      0,
                 }"
                 @click="startEditingPrice(item.id, item.average_price)"
               >
@@ -75,11 +79,15 @@
             </td>
 
             <!-- Cost = quantity * average price -->
-            <td>{{ (item.quantity * item.average_price).toFixed(2) }}</td>
+            <td>{{ (item.quantity * item.average_price * 1.001425).toFixed(2) }}</td>
 
             <!-- Value = quantity * current price -->
             <td>
-              {{ item.current_price ? (item.quantity * item.current_price).toFixed(2) : 'N/A' }}
+              {{
+                item.current_price
+                  ? (item.quantity * item.current_price * 0.995575).toFixed(2)
+                  : 'N/A'
+              }}
             </td>
 
             <!-- Profit or Loss with percentage -->
@@ -88,17 +96,21 @@
                 :class="{
                   profit:
                     item.current_price &&
-                    item.quantity * item.current_price - item.quantity * item.average_price >= 0,
+                    item.quantity * item.current_price * 0.995575 -
+                      item.quantity * item.average_price * 1.001425 >=
+                      0,
                   loss:
                     item.current_price &&
-                    item.quantity * item.current_price - item.quantity * item.average_price < 0,
+                    item.quantity * item.current_price * 0.995575 -
+                      item.quantity * item.average_price * 1.001425 <
+                      0,
                 }"
               >
                 {{
                   item.current_price
                     ? (() => {
-                        const cost = item.quantity * item.average_price
-                        const value = item.quantity * item.current_price
+                        const cost = item.quantity * item.average_price * 1.001425
+                        const value = item.quantity * item.current_price * 0.995575
                         const profit = value - cost
                         const percent = cost !== 0 ? ((profit / cost) * 100).toFixed(2) : '0.00'
                         return (profit >= 0 ? '+' : '') + profit.toFixed(2) + ` (${percent}%)`
