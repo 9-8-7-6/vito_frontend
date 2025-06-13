@@ -134,8 +134,6 @@
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
       <span>{{ currentPage }} / {{ totalPages }} page</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-      <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
-      <button @click="goToPage">Jump to</button>
       <label>
         Per page：
         <select v-model="itemsPerPage" @change="currentPage = 1">
@@ -209,7 +207,6 @@ const editingPriceId = ref(null)
 // Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
-const jumpToPage = ref(1)
 
 // Calculate total number of pages
 const totalPages = computed(() => Math.ceil(stockHoldings.value.length / itemsPerPage.value))
@@ -329,13 +326,6 @@ const prevPage = () => {
 // Pagination: go to next page
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++
-}
-
-// Jump to specified page
-const goToPage = () => {
-  if (jumpToPage.value >= 1 && jumpToPage.value <= totalPages.value) {
-    currentPage.value = jumpToPage.value
-  }
 }
 
 // Fetch data when component mounts

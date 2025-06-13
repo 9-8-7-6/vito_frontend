@@ -112,10 +112,6 @@
       <span>{{ currentPage }} / {{ totalPages }} page</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
 
-      <!-- Jump to specific page -->
-      <input v-model.number="jumpToPage" type="number" min="1" :max="totalPages" />
-      <button @click="goToPage">Jump to</button>
-
       <!-- Items per page dropdown -->
       <label>
         Per page：
@@ -319,14 +315,12 @@ watch(itemsPerPage, (newVal) => {
   })
 })
 
-const jumpToPage = ref(1)
 const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
 
 // === Filtering by Transaction Type ===
 const filterType = ref('All')
 watch(filterType, () => {
   currentPage.value = 1
-  jumpToPage.value = 1
 })
 
 // === UI Transaction Type Toggle ===
@@ -372,7 +366,6 @@ const fetchAssetType = async () => {
 
 watch(filterType, () => {
   currentPage.value = 1
-  jumpToPage.value = 1
 })
 
 // === Create Transaction APIs ===
@@ -574,12 +567,6 @@ const prevPage = () => {
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++
-}
-
-const goToPage = () => {
-  if (jumpToPage.value >= 1 && jumpToPage.value <= totalPages.value) {
-    currentPage.value = jumpToPage.value
-  }
 }
 
 // === Initial Data Load on Mount ===
