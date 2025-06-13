@@ -9,7 +9,7 @@
     <!-- Right-aligned dropdown for account-related actions -->
     <div class="nav-menu">
       <!-- Authenticated user-only links -->
-      <button @click="toggleResource" class="menu-button">☰</button>
+      <button v-if="authStore.userId" @click="toggleResource" class="menu-button">☰</button>
       <div v-show="showResources" class="dropdown resources">
         <router-link to="/asset" class="dropdown-item" @click="showResources = false">
           Asset
