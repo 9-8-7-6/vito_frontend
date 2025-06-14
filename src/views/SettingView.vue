@@ -119,8 +119,6 @@ const handleUpdateUser = async () => {
 
   try {
     const response = await updateUserData(user.value.id, fieldsToUpdate)
-    console.log('User updated:', response?.data)
-    alert('User info updated successfully!')
   } catch (err) {
     console.error('Failed to update user:', err)
     alert('Failed to update user info')

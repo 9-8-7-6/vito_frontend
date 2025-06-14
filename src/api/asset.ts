@@ -25,7 +25,6 @@ export const getAsset = async (): Promise<AxiosResponse<any> | void> => {
       const formatted = formatFieldDate(response.data, 'updated_at')
       return { ...response, data: formatted }
     }
-    console.log(`GET ${url} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (err: any) {
     console.error('getAsset failed:', err.response?.data ?? err.message)
@@ -50,7 +49,6 @@ export const addAsset = async (asset_type: string, balance: number) => {
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
-    console.log(`POST ${API_BASE_URL} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (err: any) {
     console.error('addAsset fail', err.response?.data ?? err.message)
@@ -65,7 +63,6 @@ export const deleteAsset = async (asset_id: string): Promise<AxiosResponse<any> 
   const url = `${API_BASE_URL}/${asset_id}`
   try {
     const response: AxiosResponse<any> = await axios.delete(url)
-    console.log(`DELETE ${url} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (err: any) {
     console.error('deleteAsset failed:', err.response?.data ?? err.message)
@@ -83,7 +80,6 @@ export const updateAsset = async (
   const url = `${API_BASE_URL}/${asset_id}`
   try {
     const response: AxiosResponse<any> = await axios.patch(url, fieldsToUpdate)
-    console.log(`PATCH ${url} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (err: any) {
     console.error('updateAsset failed:', err.response?.data ?? err.message)

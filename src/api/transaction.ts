@@ -23,7 +23,6 @@ export const getTransactionsByUserId = async () => {
       const formatted = formatFieldDate(response.data, 'transaction_time')
       return { ...response, data: formatted }
     }
-    console.log(`[GET] ${url} →`, JSON.stringify(response.data, null, 2))
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -61,7 +60,6 @@ export const addTransactionIncome = async (
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
-    console.log(`[POST] ${API_BASE_URL} (Income) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -99,7 +97,6 @@ export const addTransactionExpense = async (
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
-    console.log(`[POST] ${API_BASE_URL} (Expense) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -139,7 +136,6 @@ export const addTransactionInternalTransfer = async (
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
-    console.log(`[POST] ${API_BASE_URL} (InternalTransfer) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -175,7 +171,6 @@ export const addTransactionTransfer = async (
 
   try {
     const response: AxiosResponse<any> = await axios.post(API_BASE_URL, body)
-    console.log(`[POST] ${API_BASE_URL} (Transfer) →`, response.data)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -189,7 +184,6 @@ export const deleteTransaction = async (transaction_id: string) => {
   try {
     const url = `${API_BASE_URL}/${transaction_id}`
     const response = await axios.delete(url)
-    console.log(`[DELETE] Transaction deleted:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -206,7 +200,6 @@ export const updateTransaction = async (
   try {
     const url = `${API_BASE_URL}/${transaction_id}`
     const response = await axios.patch(url, updatedFields)
-    console.log(`[PATCH] Transaction updated:`, response)
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)

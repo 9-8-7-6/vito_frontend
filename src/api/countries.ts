@@ -12,7 +12,6 @@ export const fetchCountries = async () => {
 
   try {
     const response = await axios.get(url)
-    console.log(`[GET] ${url} - Countries fetched:`, response)
     return response
   } catch (error) {
     console.error('Error fetching Countries info:', error)

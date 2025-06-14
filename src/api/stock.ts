@@ -18,7 +18,6 @@ export const fetchStockHoldingsByAccount = async () => {
   const url = `${API_BASE_URL}/account/${authStore.userId}`
   try {
     const response = await axios.get(url)
-    console.log(`[GET] ${url} - Stock holdings:`, response)
     return response
   } catch (error) {
     console.error('Error fetching stock holdings:', error)
@@ -54,7 +53,6 @@ export const createStockHolding = async (
 
   try {
     const response = await axios.post(API_BASE_URL, payload)
-    console.log(`[POST] ${API_BASE_URL} - New stock holding:`, response)
     return response
   } catch (error) {
     console.error('Error creating stock holding:', error)
@@ -76,7 +74,6 @@ export const updateStockHolding = async (
   const url = `${API_BASE_URL}/${holdingId}`
   try {
     const response = await axios.put(url, update)
-    console.log(`[PUT] ${url} - Updated holding:`, response)
     return response
   } catch (error) {
     console.error('Error updating stock holding:', error)
@@ -91,7 +88,6 @@ export const deleteStockHolding = async (holdingId: string) => {
   const url = `${API_BASE_URL}/${holdingId}`
   try {
     const response = await axios.delete(url)
-    console.log(`[DELETE] ${url} - Deleted stock holding:`, response)
     return response
   } catch (error) {
     console.error('Error deleting stock holding:', error)

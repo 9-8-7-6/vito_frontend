@@ -391,13 +391,13 @@ const createTransactionIncome = async () => {
     )
 
     if (response && response.data) {
-      alert('Transaction added successfully!')
       // Clear form
       newAmount.value = ''
       newToAssetId.value = ''
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      showForm.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -430,12 +430,12 @@ const createTransactionExpense = async () => {
     )
 
     if (response && response.data) {
-      alert('Transaction added successfully!')
       newAmount.value = ''
       newFromAssetId.value = ''
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      showForm.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -471,7 +471,6 @@ const createTransactionInternalTransfer = async () => {
     )
 
     if (response && response.data) {
-      alert('Transaction added successfully!')
       newFromAssetId.value = ''
       newToAssetId.value = ''
       newFee.value = ''
@@ -479,6 +478,7 @@ const createTransactionInternalTransfer = async () => {
       newTransactionTime.value = ''
       newNotes.value = ''
       showIncome.value = false
+      showForm.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')

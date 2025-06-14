@@ -48,7 +48,6 @@ const handleRegister = async () => {
     })
 
     // On success, notify user and redirect to login page
-    alert('Register successfully! Please login')
     router.push('/login')
   } catch (error) {
     // Handle registration failure

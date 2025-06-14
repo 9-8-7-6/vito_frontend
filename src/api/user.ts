@@ -27,8 +27,6 @@ export const getUserData = async () => {
       withCredentials: true,
     })
 
-    console.log(`GET ${url} → `, JSON.stringify(response.data, null, 2))
-
     return response
   } catch (error) {
     console.error('Failed to parse user data or send request:', error)
@@ -50,10 +48,6 @@ export const updateUserData = async (user_id: string, fieldsToUpdate: Record<str
     const url = `${API_BASE_URL}/${user_id}`
 
     const response = await axios.patch(url, fieldsToUpdate)
-
-    console.log(
-      `Sending PATCH request to url ${url} for ${user_id} user, response: ${JSON.stringify(response, null, 2)}`,
-    )
 
     return response
   } catch (error) {
