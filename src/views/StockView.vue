@@ -129,11 +129,18 @@
       </table>
     </div>
 
+    <!-- Toggle create form -->
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      Create New Stock Holding
+    </button>
+
     <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} page</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      <span>{{ currentPage }} / {{ totalPages }} </span>
+      <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0">
+        Next
+      </button>
       <label>
         Per page：
         <select v-model="itemsPerPage" @change="currentPage = 1">
@@ -143,11 +150,6 @@
         </select>
       </label>
     </div>
-
-    <!-- Toggle create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
-      Create New Stock Holding
-    </button>
 
     <!-- Form for adding new holding -->
     <div v-if="showForm" class="asset-form">

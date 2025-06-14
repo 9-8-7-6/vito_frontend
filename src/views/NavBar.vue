@@ -20,11 +20,6 @@
         <router-link to="/stock" class="dropdown-item" @click="showResources = false">
           Stock
         </router-link>
-      </div>
-
-      <!-- Account toggle -->
-      <button @click="toggleDropdown" class="menu-button">Account</button>
-      <div v-show="dropdownVisible" class="dropdown">
         <router-link
           v-if="!authStore.userId"
           to="/register"
@@ -41,7 +36,6 @@
         >
           Login
         </router-link>
-        <button v-if="authStore.userId" @click="handleLogout" class="dropdown-item">Logout</button>
         <router-link
           v-if="authStore.userId"
           to="/setting"
@@ -50,7 +44,9 @@
         >
           Setting
         </router-link>
+        <button v-if="authStore.userId" @click="handleLogout" class="dropdown-item">Logout</button>
       </div>
+      <div v-show="dropdownVisible" class="dropdown"></div>
     </div>
   </nav>
 </template>
@@ -156,7 +152,7 @@ onBeforeUnmount(() => {
 
 .menu-button {
   background: #444;
-  border: none;
+  border: 0.5px, solid, black;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
   color: #fff;
@@ -214,9 +210,6 @@ onBeforeUnmount(() => {
   }
 
   .nav-menu {
-    width: 100%;
-  }
-  .menu-button {
     width: 100%;
   }
 

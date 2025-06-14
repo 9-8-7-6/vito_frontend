@@ -66,10 +66,15 @@
       </table>
     </div>
 
+    <!-- Create new asset section -->
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      Create New Asset
+    </button>
+
     <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} page</span>
+      <span>{{ currentPage }} / {{ totalPages }} </span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
       <label>
         Per page：
@@ -80,11 +85,6 @@
         </select>
       </label>
     </div>
-
-    <!-- Create new asset section -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
-      Create New Asset
-    </button>
 
     <!-- New asset form -->
     <div v-if="showForm" class="asset-form">

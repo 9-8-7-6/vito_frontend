@@ -106,10 +106,15 @@
       </table>
     </div>
 
+    <!-- Button to open create form -->
+    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
+      Create New Transaction
+    </button>
+
     <!-- Pagination controls -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} page</span>
+      <span>{{ currentPage }} / {{ totalPages }} </span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
 
       <!-- Items per page dropdown -->
@@ -122,11 +127,6 @@
         </select>
       </label>
     </div>
-
-    <!-- Button to open create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
-      Create New Transaction
-    </button>
 
     <!-- Choose transaction type -->
     <div v-if="showForm" class="transaction-form">
