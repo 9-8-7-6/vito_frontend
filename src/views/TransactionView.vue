@@ -745,7 +745,7 @@ td {
   }
   .table-container table {
     width: auto;
-    min-width: 100%;
+    min-width: max-content;
   }
   th,
   td {

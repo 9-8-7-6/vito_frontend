@@ -386,4 +386,57 @@ td {
 .neutral {
   color: white;
 }
+
+/* ============== MOBILE (<=768px) ============== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
+
+  /* filter buttons stack */
+  .filter-transaction-type {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .filter-transaction-type button {
+    flex: 1 1 48%;
+    font-size: 0.9rem;
+  }
+
+  /* table becomes horizontally scrollable */
+  .table-container {
+    overflow-x: auto;
+  }
+  .table-container table {
+    width: auto;
+    min-width: max-content;
+  }
+  th,
+  td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  /* create button full width */
+  .create-transaction-button {
+    width: 100%;
+  }
+
+  /* transaction type toggle buttons full width */
+  .transaction-form button {
+    flex: 1 1 48%;
+    width: auto;
+  }
+
+  /* form wrappers adapt */
+  .create-transaction-form-wrapper {
+    width: 100%;
+    padding: 15px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    width: 100%;
+  }
+}
 </style>
