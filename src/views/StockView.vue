@@ -135,21 +135,13 @@
     </button>
 
     <!-- Pagination controls -->
-    <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0">
-        Next
-      </button>
-      <label>
-        Per page：
-        <select v-model="itemsPerPage" @change="currentPage = 1">
-          <option :value="10">10</option>
-          <option :value="50">50</option>
-          <option :value="100">100</option>
-        </select>
-      </label>
-    </div>
+    <Pagination
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :itemsPerPage="itemsPerPage"
+      @update:currentPage="(val) => (currentPage = val)"
+      @update:itemsPerPage="(val) => (itemsPerPage = val)"
+    />
 
     <!-- Form for adding new holding -->
     <div v-if="showForm" class="asset-form">
@@ -191,6 +183,7 @@ import {
   updateStockHolding,
   deleteStockHolding,
 } from '../api/stock'
+import Pagination from './Pagination.vue'
 
 // Reactive references for holding data and form inputs
 const stockHoldings = ref([])
@@ -320,16 +313,6 @@ const cancelEditing = () => {
   editingPriceId.value = null
 }
 
-// Pagination: go to previous page
-const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--
-}
-
-// Pagination: go to next page
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++
-}
-
 // Fetch data when component mounts
 onMounted(fetchHoldings)
 </script>
@@ -361,7 +344,6 @@ table {
 .table-container table {
   width: 100%;
   border-collapse: collapse;
-
   table-layout: fixed;
 }
 
@@ -492,32 +474,56 @@ td {
   font-weight: bold;
 }
 
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
+/* ============== MOBILE (<=768px) ============== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
 
-.pagination button {
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+  /* filter buttons stack */
+  .filter-transaction-type {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .filter-transaction-type button {
+    flex: 1 1 48%;
+    font-size: 0.9rem;
+  }
 
-.pagination button:disabled {
-  background-color: gray;
-  cursor: not-allowed;
-}
+  /* table becomes horizontally scrollable */
+  .table-container {
+    overflow-x: auto;
+  }
+  .table-container table {
+    width: auto;
+    min-width: 100%;
+  }
+  th,
+  td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
 
-.pagination select,
-.pagination input {
-  padding: 5px;
-  font-size: 16px;
-  width: 60px;
+  /* create button full width */
+  .create-transaction-button {
+    width: 100%;
+  }
+
+  /* transaction type toggle buttons full width */
+  .transaction-form button {
+    flex: 1 1 48%;
+    width: auto;
+  }
+
+  /* form wrappers adapt */
+  .create-transaction-form-wrapper {
+    width: 100%;
+    padding: 15px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    width: 100%;
+  }
 }
 </style>

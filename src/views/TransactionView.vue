@@ -112,21 +112,13 @@
     </button>
 
     <!-- Pagination controls -->
-    <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-
-      <!-- Items per page dropdown -->
-      <label>
-        Per page：
-        <select v-model="itemsPerPage" @change="currentPage = 1">
-          <option :value="10">10</option>
-          <option :value="50">50</option>
-          <option :value="100">100</option>
-        </select>
-      </label>
-    </div>
+    <Pagination
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :itemsPerPage="itemsPerPage"
+      @update:currentPage="(val) => (currentPage = val)"
+      @update:itemsPerPage="(val) => (itemsPerPage = val)"
+    />
 
     <!-- Choose transaction type -->
     <div v-if="showForm" class="transaction-form">
@@ -273,6 +265,7 @@ import {
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
 import { getCookie, setCookie } from 'typescript-cookie'
+import Pagination from './Pagination.vue'
 
 // === UI State ===
 const showForm = ref(false)
@@ -306,16 +299,13 @@ const editedTypeValue = ref('')
 const currentPage = ref(1)
 const itemsPerPage = ref(parseInt(getCookie('itemsPerPage') || '10', 10))
 
-// Save pagination preference to cookie
-watch(itemsPerPage, (newVal) => {
-  setCookie('itemsPerPage', newVal.toString(), {
-    path: '/',
-    sameSite: 'none',
-    secure: true,
-  })
-})
-
 const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredTransactions.value.slice(start, end)
+})
 
 // === Filtering by Transaction Type ===
 const filterType = ref('All')
@@ -553,22 +543,6 @@ const filteredTransactions = computed(() => {
   return transactions.value.filter((t) => t.transaction_type === filterType.value)
 })
 
-// Paginate the filtered data
-const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredTransactions.value.slice(start, end)
-})
-
-// === Pagination Methods ===
-const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++
-}
-
 // === Initial Data Load on Mount ===
 onMounted(async () => {
   await fetchTransactions()
@@ -667,31 +641,6 @@ td {
 .create-transaction-button {
   margin-top: 20px;
   width: auto;
-}
-
-/* === pagination === */
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-.pagination button:disabled {
-  background-color: gray;
-  cursor: not-allowed;
-}
-
-.pagination select,
-.pagination input {
-  padding: 5px;
-  font-size: 16px;
-  width: 60px;
 }
 
 /* === delete button === */
@@ -802,17 +751,6 @@ td {
   td {
     padding: 6px;
     font-size: 0.8rem;
-  }
-
-  /* pagination stacks */
-  .pagination {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .pagination button,
-  .pagination input,
-  .pagination select {
-    width: 100%;
   }
 
   /* create button full width */

@@ -72,19 +72,13 @@
     </button>
 
     <!-- Pagination controls -->
-    <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
-      <span>{{ currentPage }} / {{ totalPages }} </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-      <label>
-        Per page：
-        <select v-model="itemsPerPage" @change="currentPage = 1">
-          <option :value="10">10</option>
-          <option :value="50">50</option>
-          <option :value="100">100</option>
-        </select>
-      </label>
-    </div>
+    <Pagination
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :itemsPerPage="itemsPerPage"
+      @update:currentPage="(val) => (currentPage = val)"
+      @update:itemsPerPage="(val) => (itemsPerPage = val)"
+    />
 
     <!-- New asset form -->
     <div v-if="showForm" class="asset-form">
@@ -103,6 +97,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
+import Pagination from './Pagination.vue'
 
 // State: Asset list and form inputs
 const assets = ref([])
@@ -122,6 +117,13 @@ const showForm = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const totalPages = computed(() => Math.ceil(assets.value.length / itemsPerPage.value))
+
+// Pagination logic
+const paginatedAssets = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return assets.value.slice(start, end)
+})
 
 // Fetch data from API
 const fetchAssets = async () => {
@@ -223,21 +225,6 @@ const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
-// Pagination logic
-const paginatedAssets = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return assets.value.slice(start, end)
-})
-
-const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++
-}
-
 // Run on component mount
 onMounted(fetchAssets)
 </script>
@@ -269,7 +256,6 @@ table {
 .table-container table {
   width: 100%;
   border-collapse: collapse;
-
   table-layout: fixed;
 }
 
@@ -399,34 +385,5 @@ td {
 
 .neutral {
   color: white;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.pagination button:disabled {
-  background-color: gray;
-  cursor: not-allowed;
-}
-
-.pagination select,
-.pagination input {
-  padding: 5px;
-  font-size: 16px;
-  width: 60px;
 }
 </style>
