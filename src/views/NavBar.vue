@@ -9,15 +9,30 @@
     <!-- Right-aligned dropdown for account-related actions -->
     <div class="nav-menu">
       <!-- Authenticated user-only links -->
-      <button v-if="authStore.userId" @click="toggleResource" class="menu-button">☰</button>
+      <button @click="toggleResource" class="menu-button">☰</button>
       <div v-show="showResources" class="dropdown resources">
-        <router-link to="/asset" class="dropdown-item" @click="showResources = false">
+        <router-link
+          v-if="authStore.userId"
+          to="/asset"
+          class="dropdown-item"
+          @click="showResources = false"
+        >
           Asset
         </router-link>
-        <router-link to="/transaction" class="dropdown-item" @click="showResources = false">
+        <router-link
+          v-if="authStore.userId"
+          to="/transaction"
+          class="dropdown-item"
+          @click="showResources = false"
+        >
           Transaction
         </router-link>
-        <router-link to="/stock" class="dropdown-item" @click="showResources = false">
+        <router-link
+          v-if="authStore.userId"
+          to="/stock"
+          class="dropdown-item"
+          @click="showResources = false"
+        >
           Stock
         </router-link>
         <router-link

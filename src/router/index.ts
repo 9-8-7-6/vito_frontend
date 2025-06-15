@@ -14,17 +14,37 @@ import { useAuthStore } from '@/stores/auth'
 
 // Define all routes in the application
 const routes = [
-  { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/register', name: 'Register', component: Register },
-  { path: '/asset', name: 'Asset', component: Asset, meta: { requiresAuth: true } },
-  { path: '/setting', name: 'Setting', component: Setting, meta: { requiresAuth: true } },
-  { path: '/stock', name: 'Stock', component: Stock, meta: { requiresAuth: true } },
+  { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true, title: 'Home - Vito' } },
+  { path: '/login', name: 'Login', component: Login, meta: { title: 'Accounts: Sign in - Vito' } },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+    meta: { title: 'Accounts: Sign up - Vito' },
+  },
+  {
+    path: '/asset',
+    name: 'Asset',
+    component: Asset,
+    meta: { requiresAuth: true, title: 'Asset - Vito' },
+  },
+  {
+    path: '/setting',
+    name: 'Setting',
+    component: Setting,
+    meta: { requiresAuth: true, title: 'Setting - Vito' },
+  },
+  {
+    path: '/stock',
+    name: 'Stock',
+    component: Stock,
+    meta: { requiresAuth: true, title: 'Stock - Vito' },
+  },
   {
     path: '/transaction',
     name: 'Transaction',
     component: Transaction,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Transaction - Vito' },
   },
 ]
 
@@ -37,6 +57,9 @@ const router = createRouter({
 // Navigation guard to check auth before each route
 router.beforeEach(async (to) => {
   const isAuthenticated = await AuthCheck()
+
+  document.title = (to.meta.title as string) || 'Vito App'
+
   if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
     return { path: '/' }
   }
