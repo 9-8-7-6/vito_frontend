@@ -220,7 +220,6 @@ onBeforeUnmount(() => {
   .left-links .logo,
   .left-links .nav-link {
     flex: 1 1 48%;
-    text-align: center;
     padding: 8px 0;
   }
 
@@ -237,7 +236,6 @@ onBeforeUnmount(() => {
   }
   .dropdown-item {
     padding: 12px;
-    text-align: center;
   }
 }
 </style>

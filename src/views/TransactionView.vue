@@ -388,6 +388,7 @@ const createTransactionIncome = async () => {
       newNotes.value = ''
       showIncome.value = false
       showForm.value = false
+      showIncome.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -426,6 +427,7 @@ const createTransactionExpense = async () => {
       newNotes.value = ''
       showIncome.value = false
       showForm.value = false
+      showExpense.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -467,8 +469,8 @@ const createTransactionInternalTransfer = async () => {
       newAmount.value = ''
       newTransactionTime.value = ''
       newNotes.value = ''
-      showIncome.value = false
       showForm.value = false
+      showInternalTransfer.value = false
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
