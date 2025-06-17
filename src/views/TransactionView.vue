@@ -27,12 +27,20 @@
         <tbody>
           <template v-for="[date, transactions] in groupedTransactions" :key="date">
             <tr @click="toggleDate(date)" class="date-row">
-              <td colspan="7">
-                📅 {{ date }}（{{ transactions.length }} records）
-                <span style="float: right">{{ expandedDates.has(date) ? '▼' : '▶' }}</span>
-                Income: ${{ dailyTotals.get(date)?.Income ?? '0.00' }}, Expense: ${{
-                  dailyTotals.get(date)?.Expense ?? '0.00'
-                }}, Internal: ${{ dailyTotals.get(date)?.InternalTransfer ?? '0.00' }}
+              <td colspan="7" class="date-row">
+                <div class="summary-labels">
+                  {{ date }} ({{ transactions.length }} rows)
+                  <span class="summary-income">
+                    Income: ${{ dailyTotals.get(date)?.Income ?? '0.00' }}
+                  </span>
+                  <span class="summary-expense">
+                    Expense: ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
+                  </span>
+                  <span class="summary-internal">
+                    Internal: ${{ dailyTotals.get(date)?.InternalTransfer ?? '0.00' }}
+                  </span>
+                  <span style="float: right">{{ expandedDates.has(date) ? '▼' : '▶' }}</span>
+                </div>
               </td>
             </tr>
 
@@ -843,5 +851,42 @@ td {
   .form-group button {
     width: 100%;
   }
+}
+.summary-labels {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr auto;
+  column-gap: 1rem;
+  align-items: center;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+.summary-income,
+.summary-expense,
+.summary-internal {
+  text-align: left;
+}
+.date-row td {
+  padding-left: 1rem;
+}
+
+.summary-income {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.summary-expense {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.summary-internal {
+  color: #ffffff;
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+.date-row td {
+  text-align: left;
 }
 </style>
