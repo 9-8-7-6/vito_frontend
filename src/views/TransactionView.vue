@@ -25,83 +25,98 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Iterate through paginated transactions -->
-          <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
-            <!-- Show running number considering current page -->
-            <td>{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
+          <template v-for="[date, transactions] in groupedTransactions" :key="date">
+            <tr @click="toggleDate(date)" class="date-row">
+              <td colspan="7">
+                📅 {{ date }}（{{ transactions.length }} records）
+                <span style="float: right">{{ expandedDates.has(date) ? '▼' : '▶' }}</span>
+                Income: ${{ dailyTotals.get(date)?.Income ?? '0.00' }}, Expense: ${{
+                  dailyTotals.get(date)?.Expense ?? '0.00'
+                }}, Internal: ${{ dailyTotals.get(date)?.InternalTransfer ?? '0.00' }}
+              </td>
+            </tr>
 
-            <!-- Display asset direction (e.g. A -> B) -->
-            <td>
-              <span v-if="transaction.from_asset_type && transaction.to_asset_type">
-                {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
-              </span>
-              <span v-else-if="transaction.from_asset_type">
-                {{ transaction.from_asset_type }}
-              </span>
-              <span v-else-if="transaction.to_asset_type">
-                {{ transaction.to_asset_type }}
-              </span>
-            </td>
-
-            <!-- Editable amount field -->
-            <td>
-              <span
-                v-if="editingId !== transaction.id"
-                :class="['amount-display', transaction.transaction_type]"
-                @click="startEditing(transaction.id, transaction.amount, 'amount')"
-              >
-                <!-- Show +amount or -amount based on transaction type -->
-                {{
-                  transaction.transaction_type === 'Income'
-                    ? '+' + transaction.amount
-                    : transaction.transaction_type === 'Expense'
-                      ? '-' + transaction.amount
-                      : transaction.amount
-                }}
-              </span>
-              <!-- Input field shown when editing amount -->
-              <input
-                v-else-if="editingField === 'amount'"
-                v-model="editedValue"
-                type="number"
-                @keyup.enter="
-                  updateTransactionField(transaction.id, 'amount', parseFloat(editedValue))
-                "
-                @blur="cancelEditing"
-              />
-            </td>
-
-            <!-- Editable fee field -->
-            <td>
-              <span
-                v-if="editingId !== transaction.id"
-                @click="startEditing(transaction.id, transaction.fee, 'fee')"
-              >
-                {{ transaction.fee }}
-              </span>
-              <!-- Input field shown when editing fee -->
-              <input
-                v-else-if="editingField === 'fee'"
-                v-model="editedValue"
-                type="number"
-                @keyup.enter="
-                  updateTransactionField(transaction.id, 'fee', parseFloat(editedValue))
-                "
-                @blur="cancelEditing"
-              />
-            </td>
-
-            <!-- Display time and notes -->
-            <td>{{ transaction.transaction_time }}</td>
-            <td>{{ transaction.notes }}</td>
-
-            <!-- Delete transaction button -->
-            <td>
-              <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
-                Delete
-              </button>
-            </td>
-          </tr>
+            <tr
+              v-for="(transaction, index) in expandedDates.has(date) ? transactions : []"
+              :key="transaction.id"
+              class="transaction-row"
+            >
+              <td>{{ index + 1 }}</td>
+              <td>
+                <span v-if="transaction.from_asset_type && transaction.to_asset_type">
+                  {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
+                </span>
+                <span v-else-if="transaction.from_asset_type">
+                  {{ transaction.from_asset_type }}
+                </span>
+                <span v-else-if="transaction.to_asset_type">
+                  {{ transaction.to_asset_type }}
+                </span>
+              </td>
+              <td>
+                <span
+                  v-if="editingId !== transaction.id"
+                  :class="['amount-display', transaction.transaction_type]"
+                  @click="startEditing(transaction.id, transaction.amount, 'amount')"
+                >
+                  {{
+                    transaction.transaction_type === 'Income'
+                      ? '+' + transaction.amount
+                      : transaction.transaction_type === 'Expense'
+                        ? '-' + transaction.amount
+                        : transaction.amount
+                  }}
+                </span>
+                <input
+                  v-else-if="editingField === 'amount'"
+                  v-model="editedValue"
+                  type="number"
+                  @keyup.enter="
+                    updateTransactionField(transaction.id, 'amount', parseFloat(editedValue))
+                  "
+                  @blur="cancelEditing"
+                />
+              </td>
+              <td>
+                <span
+                  v-if="editingId !== transaction.id"
+                  @click="startEditing(transaction.id, transaction.fee, 'fee')"
+                >
+                  {{ transaction.fee }}
+                </span>
+                <input
+                  v-else-if="editingField === 'fee'"
+                  v-model="editedValue"
+                  type="number"
+                  @keyup.enter="
+                    updateTransactionField(transaction.id, 'fee', parseFloat(editedValue))
+                  "
+                  @blur="cancelEditing"
+                />
+              </td>
+              <td>{{ transaction.transaction_time }}</td>
+              <td>
+                <span
+                  v-if="editingId !== transaction.id || editingField !== 'notes'"
+                  @click="startEditing(transaction.id, transaction.notes, 'notes')"
+                >
+                  {{ transaction.notes || '-' }}
+                </span>
+                <input
+                  v-else
+                  v-model="editedValue"
+                  type="text"
+                  @keyup.enter="updateTransactionField(transaction.id, 'notes', editedValue)"
+                  @blur="cancelEditing"
+                />
+              </td>
+              <td>
+                <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -266,6 +281,7 @@ import {
 import { getAsset } from '../api/asset'
 import { getCookie, setCookie } from 'typescript-cookie'
 import Pagination from './Pagination.vue'
+import dayjs from 'dayjs'
 
 // === UI State ===
 const showForm = ref(false)
@@ -295,11 +311,63 @@ const editingField = ref('')
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
 
+const expandedDates = ref(new Set())
+
+const toggleDate = (date) => {
+  if (expandedDates.value.has(date)) {
+    expandedDates.value.delete(date)
+  } else {
+    expandedDates.value.add(date)
+  }
+}
+
+const groupedTransactionsRaw = computed(() => {
+  const groups = {}
+  for (const tx of filteredTransactions.value) {
+    const date = dayjs(tx.transaction_time).format('YYYY-MM-DD')
+    if (!groups[date]) groups[date] = []
+    groups[date].push(tx)
+  }
+
+  const sorted = Object.entries(groups).sort(([a], [b]) => (a < b ? 1 : -1)) // 日期新到舊
+  return sorted
+})
+
+const groupedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return groupedTransactionsRaw.value.slice(start, end)
+})
+
+const dailyTotals = computed(() => {
+  const map = new Map()
+  for (const tx of filteredTransactions.value) {
+    const date = dayjs(tx.transaction_time).format('YYYY-MM-DD')
+    if (!map.has(date)) {
+      map.set(date, { Income: 0, Expense: 0, InternalTransfer: 0 })
+    }
+    const category = tx.transaction_type
+    map.get(date)[category] += Number(tx.amount || 0)
+  }
+
+  for (const [date, totals] of map.entries()) {
+    map.set(date, {
+      Income: totals.Income.toFixed(2),
+      Expense: totals.Expense.toFixed(2),
+      InternalTransfer: totals.InternalTransfer.toFixed(2),
+    })
+  }
+
+  return map
+})
+
 // === Pagination ===
 const currentPage = ref(1)
 const itemsPerPage = ref(parseInt(getCookie('itemsPerPage') || '10', 10))
 
-const totalPages = computed(() => Math.ceil(transactions.value.length / itemsPerPage.value))
+const totalPages = computed(() =>
+  Math.ceil(groupedTransactionsRaw.value.length / itemsPerPage.value),
+)
 
 const paginatedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
