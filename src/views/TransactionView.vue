@@ -332,7 +332,7 @@ const fetchTransactions = async () => {
   try {
     const response = await getTransactionsByUserId()
     if (response && response.data) {
-      transactions.value = response.data
+      transactions.value = response.data.reverse()
     } else {
       console.error('Invalid API response', response)
     }
@@ -588,7 +588,6 @@ table {
 .table-container table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 .table-container thead {

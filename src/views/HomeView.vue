@@ -3,10 +3,8 @@
     <div class="wrapper">
       <mark>
         <em>
-          <p style="color: gainsboro; font-size: 200%">
-            Keep grinding!<br />
-            Your life can change in one year!
-          </p>
+          <p class="quote">Keep grinding!</p>
+          <p class="quote">Your life can change in one year!</p>
         </em>
       </mark>
     </div>
@@ -22,5 +20,10 @@ const authStore = useAuthStore()
 .wrapper {
   text-align: center;
   padding: 20px;
+}
+
+.quote {
+  color: gainsboro;
+  font-size: 200%;
 }
 </style>
