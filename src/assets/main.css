@@ -5,9 +5,7 @@
 }
 
 #app {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: calc(2rem + var(--navbar-height)) 2rem 2rem;
   font-weight: normal;
 }
 
@@ -29,7 +27,6 @@ a,
   #app {
     display: grid;
     grid-template-columns: auto;
-    padding: 0 2rem;
   }
 }
 
@@ -39,7 +36,7 @@ a,
   }
 
   #app {
-    padding: calc(1rem + var(--navbar-height)) 1rem 1rem;
+    padding: calc(1rem + var(--navbar-height)) 1rem 0rem;
   }
 
   .navbar {

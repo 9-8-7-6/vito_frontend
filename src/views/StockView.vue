@@ -17,7 +17,7 @@
         </thead>
         <tbody>
           <!-- Iterate through paginated data -->
-          <tr v-for="(item, index) in paginatedStockHoldings" :key="item.id">
+          <tr v-for="item in paginatedStockHoldings" :key="item.id">
             <!-- Display stock symbol and company name -->
             <td>{{ `${item.ticker_symbol} (${item.company_name})` }}</td>
 

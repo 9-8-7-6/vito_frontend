@@ -3,17 +3,9 @@
     <div class="table-container">
       <!-- Asset table -->
       <table>
-        <thead>
-          <tr>
-            <th>Asset Type</th>
-            <th>Balance</th>
-            <th>Last time updated</th>
-            <th>Action</th>
-          </tr>
-        </thead>
         <tbody>
           <!-- Display paginated assets -->
-          <tr v-for="(asset, index) in paginatedAssets" :key="asset.id">
+          <tr v-for="asset in paginatedAssets" :key="asset.id">
             <!-- Asset type editing logic -->
             <td>
               <span
@@ -54,8 +46,6 @@
                 {{ asset.balance > 0 ? '+' + asset.balance : asset.balance }}
               </span>
             </td>
-
-            <td>{{ asset.updated_at }}</td>
 
             <!-- Delete button -->
             <td>

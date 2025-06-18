@@ -1,7 +1,6 @@
 /* color palette from <https://github.com/vuejs/theme> */
 #app {
   width: 100%;
-  max-width: 1280px;
   margin: 0 auto;
 }
 .container {

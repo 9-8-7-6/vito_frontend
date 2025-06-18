@@ -30,7 +30,7 @@
             </tr>
 
             <tr
-              v-for="(transaction, index) in expandedDates.has(date) ? transactions : []"
+              v-for="transaction in expandedDates.has(date) ? transactions : []"
               :key="transaction.id"
               class="transaction-row"
             >
