@@ -655,12 +655,6 @@ table {
   overflow: hidden;
 }
 
-.table-container {
-  max-height: 400px;
-  overflow-y: auto;
-  position: relative;
-}
-
 .table-container table {
   width: 100%;
   border-collapse: collapse;
@@ -817,13 +811,6 @@ td {
   }
 
   /* table becomes horizontally scrollable */
-  .table-container {
-    overflow-x: auto;
-  }
-  .table-container table {
-    width: auto;
-    min-width: max-content;
-  }
   th,
   td {
     padding: 6px;

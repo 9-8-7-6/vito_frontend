@@ -51,13 +51,6 @@ a,
     width: 100%;
   }
 
-  .table-container {
-    overflow-x: auto;
-  }
-  .table-container table {
-    width: auto;
-    min-width: 100%;
-  }
   th,
   td {
     padding: 8px;
