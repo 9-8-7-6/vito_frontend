@@ -130,9 +130,7 @@
     </div>
 
     <!-- Toggle create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
-      Create New Stock Holding
-    </button>
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">➕</button>
 
     <!-- Pagination controls -->
     <Pagination

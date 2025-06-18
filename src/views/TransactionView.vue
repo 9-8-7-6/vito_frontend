@@ -13,33 +13,18 @@
 
       <!-- Table to display paginated transactions -->
       <table>
-        <thead>
-          <tr>
-            <th>Number</th>
-            <th>Asset</th>
-            <th>Amount</th>
-            <th>Fee</th>
-            <th>Transaction Time</th>
-            <th>Notes</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
         <tbody>
           <template v-for="[date, transactions] in groupedTransactions" :key="date">
             <tr @click="toggleDate(date)" class="date-row">
-              <td colspan="7" class="date-row">
+              <td colspan="4" class="date-row">
                 <div class="summary-labels">
                   {{ date }} ({{ transactions.length }} rows)
                   <span class="summary-income">
-                    Income: ${{ dailyTotals.get(date)?.Income ?? '0.00' }}
+                    ${{ dailyTotals.get(date)?.Income ?? '0.00' }}
                   </span>
                   <span class="summary-expense">
-                    Expense: ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
+                    ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
                   </span>
-                  <span class="summary-internal">
-                    Internal: ${{ dailyTotals.get(date)?.InternalTransfer ?? '0.00' }}
-                  </span>
-                  <span style="float: right">{{ expandedDates.has(date) ? '▼' : '▶' }}</span>
                 </div>
               </td>
             </tr>
@@ -49,7 +34,6 @@
               :key="transaction.id"
               class="transaction-row"
             >
-              <td>{{ index + 1 }}</td>
               <td>
                 <span v-if="transaction.from_asset_type && transaction.to_asset_type">
                   {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
@@ -68,11 +52,15 @@
                   @click="startEditing(transaction.id, transaction.amount, 'amount')"
                 >
                   {{
-                    transaction.transaction_type === 'Income'
-                      ? '+' + transaction.amount
+                    (transaction.transaction_type === 'Income'
+                      ? '+'
                       : transaction.transaction_type === 'Expense'
-                        ? '-' + transaction.amount
-                        : transaction.amount
+                        ? '-'
+                        : '') +
+                    transaction.amount +
+                    '(' +
+                    transaction.fee +
+                    ')'
                   }}
                 </span>
                 <input
@@ -85,24 +73,7 @@
                   @blur="cancelEditing"
                 />
               </td>
-              <td>
-                <span
-                  v-if="editingId !== transaction.id"
-                  @click="startEditing(transaction.id, transaction.fee, 'fee')"
-                >
-                  {{ transaction.fee }}
-                </span>
-                <input
-                  v-else-if="editingField === 'fee'"
-                  v-model="editedValue"
-                  type="number"
-                  @keyup.enter="
-                    updateTransactionField(transaction.id, 'fee', parseFloat(editedValue))
-                  "
-                  @blur="cancelEditing"
-                />
-              </td>
-              <td>{{ transaction.transaction_time }}</td>
+
               <td>
                 <span
                   v-if="editingId !== transaction.id || editingField !== 'notes'"
@@ -130,9 +101,7 @@
     </div>
 
     <!-- Button to open create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
-      Create New Transaction
-    </button>
+    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">➕</button>
 
     <!-- Pagination controls -->
     <Pagination

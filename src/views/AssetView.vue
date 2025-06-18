@@ -66,10 +66,7 @@
       </table>
     </div>
 
-    <!-- Create new asset section -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
-      Create New Asset
-    </button>
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">➕</button>
 
     <!-- Pagination controls -->
     <Pagination
