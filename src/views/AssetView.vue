@@ -49,14 +49,18 @@
 
             <!-- Delete button -->
             <td>
-              <button class="action-button" @click="handleDeleteAsset(asset.id)">Delete</button>
+              <button class="action-button" @click="handleDeleteAsset(asset.id)">
+                <font-awesome-icon :icon="['fas', 'trash']" />
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">➕</button>
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      <font-awesome-icon :icon="['fas', 'plus']" />
+    </button>
 
     <!-- Pagination controls -->
     <Pagination

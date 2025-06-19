@@ -1,10 +1,12 @@
 <template>
   <div class="pagination">
     <div class="pagination-controls">
-      <button @click="prevPage" :disabled="currentPage === 1">Pre</button>
+      <button @click="prevPage" :disabled="currentPage === 1">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+      </button>
       <span>{{ currentPage }}/{{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage === totalPages || totalPages === 0">
-        Next
+        <font-awesome-icon icon="fa-solid fa-arrow-right" />
       </button>
     </div>
 

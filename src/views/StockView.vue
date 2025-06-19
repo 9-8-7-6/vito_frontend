@@ -122,7 +122,9 @@
 
             <!-- Delete button -->
             <td>
-              <button class="action-button" @click="handleDeleteHolding(item.id)">Delete</button>
+              <button class="action-button" @click="handleDeleteHolding(item.id)">
+                <font-awesome-icon :icon="['fas', 'trash']" />
+              </button>
             </td>
           </tr>
         </tbody>
@@ -130,7 +132,9 @@
     </div>
 
     <!-- Toggle create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">➕</button>
+    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+      <font-awesome-icon :icon="['fas', 'plus']" />
+    </button>
 
     <!-- Pagination controls -->
     <Pagination

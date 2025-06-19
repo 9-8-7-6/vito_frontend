@@ -91,7 +91,7 @@
               </td>
               <td>
                 <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
-                  Delete
+                  <font-awesome-icon :icon="['fas', 'trash']" />
                 </button>
               </td>
             </tr>
@@ -101,7 +101,9 @@
     </div>
 
     <!-- Button to open create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">➕</button>
+    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
+      <font-awesome-icon :icon="['fas', 'plus']" />
+    </button>
 
     <!-- Pagination controls -->
     <Pagination
@@ -673,7 +675,7 @@ button:hover {
 th,
 td {
   border: 1px solid #444;
-  padding: 10px;
+  padding: 10px 0px 10px 10px;
   text-align: center;
   font-size: 1rem;
 }
@@ -811,7 +813,7 @@ td {
 .summary-labels {
   display: grid;
   grid-template-columns: auto 1fr 1fr 1fr auto;
-  column-gap: 1rem;
+  column-gap: 10px;
   align-items: center;
   width: 100%;
   margin-top: 4px;
@@ -821,9 +823,6 @@ td {
 .summary-expense,
 .summary-internal {
   text-align: left;
-}
-.date-row td {
-  padding-left: 1rem;
 }
 
 .summary-income {
