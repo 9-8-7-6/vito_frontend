@@ -603,9 +603,8 @@ onMounted(async () => {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  min-height: 100vh;
 }
 
 /* === filter buttons === */
@@ -783,7 +782,8 @@ td {
 /* ============== MOBILE (<=768px) ============== */
 @media (max-width: 768px) {
   .container {
-    padding: 1rem 0.5rem;
+    justify-content: flex-start;
+    padding-top: 1rem;
   }
 
   /* filter buttons stack */

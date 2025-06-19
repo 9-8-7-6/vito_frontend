@@ -149,9 +149,8 @@ watch(timezone, (newVal) => {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  min-height: 100vh;
 }
 
 table {
@@ -337,5 +336,26 @@ td {
 option {
   background-color: #1e1e1e;
   color: #fff;
+}
+
+@media (max-width: 768px) {
+  .container {
+    justify-content: flex-start;
+    padding-top: 1rem;
+  }
+
+  /* table becomes horizontally scrollable */
+  .table-container {
+    overflow-x: auto;
+  }
+  .table-container table {
+    width: auto;
+    min-width: max-content;
+  }
+  th,
+  td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
 }
 </style>

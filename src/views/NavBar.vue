@@ -39,7 +39,7 @@
           v-if="!authStore.userId"
           to="/register"
           class="dropdown-item"
-          @click="dropdownVisible = false"
+          @click="showResources = false"
         >
           Register
         </router-link>
@@ -47,7 +47,7 @@
           v-if="!authStore.userId"
           to="/login"
           class="dropdown-item"
-          @click="dropdownVisible = false"
+          @click="showResources = false"
         >
           Login
         </router-link>
@@ -55,7 +55,7 @@
           v-if="authStore.userId"
           to="/setting"
           class="dropdown-item"
-          @click="dropdownVisible = false"
+          @click="showResources = false"
         >
           Setting
         </router-link>
