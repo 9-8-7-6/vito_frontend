@@ -280,7 +280,23 @@ button {
 }
 
 .create-asset-button {
-  margin-top: 20px;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 100;
+  background-color: #c9302c;
+  width: clamp(48px, 6vw, 80px);
+  height: clamp(48px, 6vw, 80px);
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.create-asset-button:hover {
+  background-color: #c9302c;
 }
 
 button:hover {

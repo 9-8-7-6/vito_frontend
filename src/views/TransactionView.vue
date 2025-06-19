@@ -681,8 +681,23 @@ td {
 }
 
 .create-transaction-button {
-  margin-top: 20px;
-  width: auto;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 100;
+  background-color: #d9534f;
+  width: clamp(48px, 6vw, 80px);
+  height: clamp(48px, 6vw, 80px);
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.create-transaction-button:hover {
+  background-color: #c9302c;
 }
 
 /* === delete button === */
@@ -786,11 +801,6 @@ td {
   td {
     padding: 6px;
     font-size: 0.8rem;
-  }
-
-  /* create button full width */
-  .create-transaction-button {
-    width: 100%;
   }
 
   /* transaction type toggle buttons full width */
