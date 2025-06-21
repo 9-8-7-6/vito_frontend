@@ -24,17 +24,20 @@
 
       <!-- Table to display paginated transactions -->
       <table>
+        <colgroup>
+          <col span="12" style="width: 8.3333%" />
+        </colgroup>
         <thead>
           <tr>
-            <th>
+            <th colspan="4">
               <div>Income</div>
               <div class="profit">{{ income_sum }}</div>
             </th>
-            <th>
+            <th colspan="4">
               <div>Expenses</div>
               <div class="loss">{{ expenses_sum }}</div>
             </th>
-            <th>
+            <th colspan="4">
               <div>Total</div>
               <div class="neutral">{{ month_total }}</div>
             </th>
@@ -48,12 +51,16 @@
             :key="date"
           >
             <tr class="date-row" @click="toggleDate(date)">
-              <td colspan="4">
-                {{ date }} ({{ txs.length }})
-                <span class="summary-income"> ${{ dailyTotals.get(date)?.Income ?? '0.00' }} </span>
-                <span class="summary-expense">
-                  ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
-                </span>
+              <td colspan="12">
+                <div class="date-row-inner">
+                  <span>{{ date }} ({{ txs.length }})</span>
+                  <span class="summary-income">
+                    ${{ dailyTotals.get(date)?.Income ?? '0.00' }}
+                  </span>
+                  <span class="summary-expense">
+                    ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
+                  </span>
+                </div>
               </td>
             </tr>
 
@@ -62,7 +69,7 @@
               :key="transaction.id"
               class="transaction-row"
             >
-              <td>
+              <td colspan="3">
                 <span v-if="transaction.from_asset_type && transaction.to_asset_type">
                   {{ transaction.from_asset_type }} -> {{ transaction.to_asset_type }}
                 </span>
@@ -73,7 +80,7 @@
                   {{ transaction.to_asset_type }}
                 </span>
               </td>
-              <td>
+              <td colspan="3">
                 <span
                   v-if="editingId !== transaction.id"
                   :class="['amount-display', transaction.transaction_type]"
@@ -102,7 +109,7 @@
                 />
               </td>
 
-              <td>
+              <td colspan="3">
                 <span
                   v-if="editingId !== transaction.id || editingField !== 'notes'"
                   @click="startEditing(transaction.id, transaction.notes, 'notes')"
@@ -117,7 +124,7 @@
                   @blur="cancelEditing"
                 />
               </td>
-              <td>
+              <td colspan="3">
                 <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
                   <font-awesome-icon :icon="['fas', 'trash']" />
                 </button>
@@ -960,8 +967,13 @@ td {
   opacity: 0.8;
 }
 
-.date-row td {
-  text-align: left;
+.date-row-inner {
+  display: flex;
+}
+
+.date-row-inner span {
+  flex: 1;
+  text-align: center;
 }
 
 .month-switcher-swipe {
