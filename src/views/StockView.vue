@@ -332,7 +332,6 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   background-color: #1e1e1e;
-  border-radius: 8px;
   overflow: hidden;
 }
 

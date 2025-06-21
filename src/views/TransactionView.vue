@@ -1,6 +1,17 @@
 <template>
   <!-- Outer container for the entire transaction interface -->
   <div class="container">
+    <div
+      class="month-switcher-swipe"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerUp"
+    >
+      <div class="month-display">
+        {{ months[currentMonthIndex] }}
+      </div>
+    </div>
     <!-- Container for the transaction table and filters -->
     <div class="table-container">
       <!-- Buttons to filter transactions by type -->
@@ -14,23 +25,24 @@
       <!-- Table to display paginated transactions -->
       <table>
         <tbody>
-          <template v-for="[date, transactions] in groupedTransactions" :key="date">
-            <tr @click="toggleDate(date)" class="date-row">
-              <td colspan="4" class="date-row">
-                <div class="summary-labels">
-                  {{ date }} ({{ transactions.length }} rows)
-                  <span class="summary-income">
-                    ${{ dailyTotals.get(date)?.Income ?? '0.00' }}
-                  </span>
-                  <span class="summary-expense">
-                    ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
-                  </span>
-                </div>
+          <template
+            v-for="[date, txs] in groupedTransactions.filter(
+              ([d, _]) => dayjs(d).format('YYYY-MM') === selectedMonth,
+            )"
+            :key="date"
+          >
+            <tr class="date-row" @click="toggleDate(date)">
+              <td colspan="4">
+                {{ date }} ({{ txs.length }} rows)
+                <span class="summary-income"> ${{ dailyTotals.get(date)?.Income ?? '0.00' }} </span>
+                <span class="summary-expense">
+                  ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
+                </span>
               </td>
             </tr>
 
             <tr
-              v-for="transaction in expandedDates.has(date) ? transactions : []"
+              v-for="transaction in expandedDates.has(date) ? txs : []"
               :key="transaction.id"
               class="transaction-row"
             >
@@ -104,15 +116,6 @@
     <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
-
-    <!-- Pagination controls -->
-    <Pagination
-      :currentPage="currentPage"
-      :totalPages="totalPages"
-      :itemsPerPage="itemsPerPage"
-      @update:currentPage="(val) => (currentPage = val)"
-      @update:itemsPerPage="(val) => (itemsPerPage = val)"
-    />
 
     <!-- Choose transaction type -->
     <div v-if="showForm" class="transaction-form">
@@ -249,6 +252,9 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { getCookie, setCookie } from 'typescript-cookie'
+import dayjs from 'dayjs'
+
 import {
   addTransactionIncome,
   addTransactionExpense,
@@ -258,9 +264,6 @@ import {
   updateTransaction,
 } from '../api/transaction'
 import { getAsset } from '../api/asset'
-import { getCookie, setCookie } from 'typescript-cookie'
-import Pagination from './Pagination.vue'
-import dayjs from 'dayjs'
 
 // === UI State ===
 const showForm = ref(false)
@@ -343,16 +346,6 @@ const dailyTotals = computed(() => {
 // === Pagination ===
 const currentPage = ref(1)
 const itemsPerPage = ref(parseInt(getCookie('itemsPerPage') || '10', 10))
-
-const totalPages = computed(() =>
-  Math.ceil(groupedTransactionsRaw.value.length / itemsPerPage.value),
-)
-
-const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredTransactions.value.slice(start, end)
-})
 
 // === Filtering by Transaction Type ===
 const filterType = ref('All')
@@ -592,6 +585,60 @@ const filteredTransactions = computed(() => {
   return transactions.value.filter((t) => t.transaction_type === filterType.value)
 })
 
+const groupedByMonth = computed(() => {
+  const map = new Map()
+  for (const tx of transactions.value) {
+    const m = dayjs(tx.transaction_time).format('YYYY-MM')
+    if (!map.has(m)) map.set(m, [])
+    map.get(m).push(tx)
+  }
+  return Array.from(map.entries())
+    .map(([month, txs]) => ({ month, transactions: txs }))
+    .sort((a, b) => (a.month > b.month ? -1 : 1))
+})
+
+const months = computed(() => groupedByMonth.value.map((g) => g.month))
+const currentMonthIndex = ref(0)
+const selectedMonth = ref('')
+watch(currentMonthIndex, (idx) => {
+  selectedMonth.value = months.value[idx]
+})
+
+watch(months, (list) => {
+  if (list.length) {
+    currentMonthIndex.value = 0
+    selectedMonth.value = list[0]
+  }
+})
+
+let startX = 0
+
+function onPointerDown(e) {
+  startX = e.clientX
+  e.target.setPointerCapture(e.pointerId)
+}
+
+function onPointerMove(e) {
+  e.preventDefault()
+}
+
+function onPointerUp(e) {
+  const dx = e.clientX - startX
+  if (dx < -30) {
+    currentMonthIndex.value = Math.max(0, currentMonthIndex.value - 1)
+  } else if (dx > 30) {
+    currentMonthIndex.value = Math.min(months.value.length - 1, currentMonthIndex.value + 1)
+  }
+  e.target.releasePointerCapture(e.pointerId)
+}
+
+watch(months, (list) => {
+  if (list.length > 0) {
+    currentMonthIndex.value = 0
+    selectedMonth.value = list[0]
+  }
+})
+
 // === Initial Data Load on Mount ===
 onMounted(async () => {
   await fetchTransactions()
@@ -621,7 +668,6 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   background-color: #1e1e1e;
-  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -644,7 +690,6 @@ select {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #444;
-  border-radius: 5px;
   background-color: #333;
   color: white;
   box-sizing: border-box;
@@ -853,5 +898,23 @@ td {
 
 .date-row td {
   text-align: left;
+}
+
+.month-switcher-swipe {
+  overflow: hidden;
+  touch-action: pan-y;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 3rem;
+  background: #f5f5f5;
+  user-select: none;
+}
+
+.month-display {
+  font-size: 1.25rem;
+  font-weight: bold;
+  min-width: 8rem;
+  text-align: center;
 }
 </style>
