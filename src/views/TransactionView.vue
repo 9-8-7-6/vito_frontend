@@ -24,6 +24,22 @@
 
       <!-- Table to display paginated transactions -->
       <table>
+        <thead>
+          <tr>
+            <th>
+              <div>Income</div>
+              <div class="profit">{{ income_sum }}</div>
+            </th>
+            <th>
+              <div>Expenses</div>
+              <div class="loss">{{ expenses_sum }}</div>
+            </th>
+            <th>
+              <div>Total</div>
+              <div class="neutral">{{ month_total }}</div>
+            </th>
+          </tr>
+        </thead>
         <tbody>
           <template
             v-for="[date, txs] in groupedTransactions.filter(
@@ -33,7 +49,7 @@
           >
             <tr class="date-row" @click="toggleDate(date)">
               <td colspan="4">
-                {{ date }} ({{ txs.length }} rows)
+                {{ date }} ({{ txs.length }})
                 <span class="summary-income"> ${{ dailyTotals.get(date)?.Income ?? '0.00' }} </span>
                 <span class="summary-expense">
                   ${{ dailyTotals.get(date)?.Expense ?? '0.00' }}
@@ -342,6 +358,35 @@ const dailyTotals = computed(() => {
 
   return map
 })
+
+function safeNumber(val) {
+  const n = Number(val)
+  return isNaN(n) ? 0 : n
+}
+
+const selectedMonthTransactions = computed(() =>
+  transactions.value.filter(
+    (tx) => dayjs(tx.transaction_time).format('YYYY-MM') === selectedMonth.value,
+  ),
+)
+
+const income_sum = computed(() =>
+  selectedMonthTransactions.value
+    .filter((tx) => tx.transaction_type === 'Income')
+    .reduce((sum, tx) => safeNumber(sum) + safeNumber(tx.amount), 0)
+    .toFixed(2),
+)
+
+const expenses_sum = computed(() =>
+  selectedMonthTransactions.value
+    .filter((tx) => tx.transaction_type === 'Expense')
+    .reduce((sum, tx) => safeNumber(sum) + safeNumber(tx.amount), 0)
+    .toFixed(2),
+)
+
+const month_total = computed(() =>
+  (Number(income_sum.value) - Number(expenses_sum.value)).toFixed(2),
+)
 
 // === Pagination ===
 const currentPage = ref(1)
@@ -671,13 +716,18 @@ table {
   overflow: hidden;
 }
 
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  position: relative;
+}
+
 .table-container table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .table-container thead {
-  position: sticky;
   top: 0;
   background-color: #333;
   z-index: 10;
@@ -822,6 +872,20 @@ td {
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+}
+
+.profit {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.loss {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.neutral {
+  color: white;
 }
 
 /* ============== MOBILE (<=768px) ============== */

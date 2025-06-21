@@ -3,6 +3,23 @@
     <div class="table-container">
       <!-- Asset table -->
       <table>
+        <thead>
+          <tr>
+            <th>
+              <div>Assets</div>
+              <div class="profit">{{ asset_sum }}</div>
+            </th>
+            <th>
+              <div>Liabilities</div>
+              <div class="loss">{{ liabilities_sum }}</div>
+            </th>
+            <th>
+              <div>Total</div>
+              <div class="neutral">{{ total }}</div>
+            </th>
+          </tr>
+        </thead>
+
         <tbody>
           <!-- Display paginated assets -->
           <tr v-for="asset in paginatedAssets" :key="asset.id">
@@ -216,6 +233,29 @@ const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
+function safeNumber(val) {
+  const n = Number(val)
+  return isNaN(n) ? 0 : n
+}
+
+const asset_sum = computed(() =>
+  assets.value
+    .filter((a) => safeNumber(a.balance) > 0)
+    .reduce((sum, a) => safeNumber(sum) + safeNumber(a.balance), 0)
+    .toFixed(2),
+)
+
+const liabilities_sum = computed(() =>
+  assets.value
+    .filter((a) => safeNumber(a.balance) < 0)
+    .reduce((sum, a) => safeNumber(sum) + Math.abs(safeNumber(a.balance)), 0)
+    .toFixed(2),
+)
+
+const total = computed(() =>
+  assets.value.reduce((sum, a) => safeNumber(sum) + safeNumber(a.balance), 0).toFixed(2),
+)
+
 // Run on component mount
 onMounted(fetchAssets)
 </script>
@@ -233,7 +273,6 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   background-color: #1e1e1e;
-  border-radius: 8px;
   overflow: hidden;
 }
 
