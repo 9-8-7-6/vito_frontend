@@ -288,7 +288,6 @@ input {
 button {
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
   background-color: #007bff;
   color: white;
   font-size: 16px;
@@ -377,23 +376,33 @@ td {
 
 .button-group {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   margin-top: 10px;
+  width: auto;
+}
+
+.button-group button {
+  padding: 10px 20px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 .cancel-button {
   background-color: #d9534f;
-  padding: 10px 20px;
-  border-radius: 5px;
   color: white;
   border: none;
-  font-size: 16px;
-  cursor: pointer;
 }
 
-.cancel-button:hover {
-  background-color: #c9302c;
+.button-group button:not(.cancel-button) {
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+.button-group button:not(.cancel-button):hover {
+  background-color: #0056b3;
 }
 
 .profit {

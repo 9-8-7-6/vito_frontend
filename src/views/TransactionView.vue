@@ -2,6 +2,7 @@
   <!-- Outer container for the entire transaction interface -->
   <div class="container">
     <div
+      v-if="showTable"
       class="month-switcher-swipe"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
@@ -134,12 +135,14 @@
 
     <!-- Choose transaction type -->
     <div v-if="showForm" class="transaction-form">
-      <button @click="toggleTransaction('income')">Income</button>
-      <button @click="toggleTransaction('expense')">Expense</button>
-      <button @click="toggleTransaction('internalTransfer')">Internal Transfer</button>
+      <div class="transaction-type-buttons">
+        <button @click="toggleTransaction('income')">Income</button>
+        <button @click="toggleTransaction('expense')">Expense</button>
+        <button @click="toggleTransaction('internalTransfer')">Internal Transfer</button>
+      </div>
       <!-- Placeholder for future transfer feature -->
       <!-- <button @click="toggleTransaction('Transfer')">Transfer</button> -->
-      <button @click="closeForm">Cancel</button>
+      <button class="cancel-button" @click="closeForm">Cancel</button>
     </div>
 
     <!-- ====================== Transaction Forms ======================= -->
@@ -816,9 +819,28 @@ td {
 /* === forms === */
 .transaction-form {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 10px;
   margin: 0 auto 20px;
+}
+
+.transaction-type-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.cancel-button {
+  background-color: #d9534f;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.cancel-button:hover {
+  background-color: #c9302c;
 }
 
 .create-transaction-form {
@@ -857,14 +879,6 @@ td {
 
 .form-group input:focus {
   border-color: #007bff;
-}
-
-.cancel-button {
-  background-color: #d9534f;
-  margin-top: 10px;
-}
-.cancel-button:hover {
-  background-color: #c9302c;
 }
 
 /* === amount display coloring === */
