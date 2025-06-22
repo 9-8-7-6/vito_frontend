@@ -133,25 +133,21 @@ form {
   position: relative;
 }
 .password-wrapper input {
+  box-sizing: border-box;
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  padding-right: 2.5rem;
+  padding-right: 3rem;
 }
 
 .toggle-password {
   position: absolute;
-  right: 8px;
   top: 50%;
+  right: 0.5rem;
   transform: translateY(-50%);
+  padding: 0.25rem;
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 0.9rem;
-  color: #6a6363;
-  padding: 2px 4px;
 }
 .toggle-password:active {
   color: black;
@@ -205,5 +201,11 @@ input {
 
 .link-text:hover {
   color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .toggle-password {
+    width: auto;
+  }
 }
 </style>
