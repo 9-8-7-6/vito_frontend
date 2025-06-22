@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="table-container">
-      <!-- Asset table -->
-      <table>
+      <!-- Asset table, hidden when form is shown -->
+      <table v-if="showTable">
         <thead>
           <tr>
             <th>
@@ -25,21 +25,23 @@
           <tr v-for="asset in assets" :key="asset.id">
             <!-- Asset type editing logic -->
             <td>
-              <span
-                v-if="editingTypeId !== asset.id"
-                class="asset-type-button"
-                @click="startEditingType(asset.id, asset.asset_type)"
-              >
-                {{ asset.asset_type }}
-              </span>
-              <input
-                v-else
-                class="asset-type-input"
-                v-model="editedTypeValue"
-                type="text"
-                @keyup.enter="handleUpdateAssetType(asset.id, asset.balance)"
-                @blur="cancelEditingType"
-              />
+              <div v-click-outside="cancelEditingType" class="asset-type-wrapper">
+                <input
+                  v-if="editingTypeId === asset.id"
+                  ref="typeInput"
+                  class="asset-type-input"
+                  v-model="editedTypeValue"
+                  @keyup.enter="handleUpdateAssetType(asset.id)"
+                  @blur="cancelEditingType"
+                />
+                <span
+                  v-else
+                  class="asset-type-button"
+                  @click="startEditingType(asset.id, asset.asset_type)"
+                >
+                  {{ asset.asset_type }}
+                </span>
+              </div>
             </td>
 
             <!-- Asset balance editing logic -->
@@ -48,7 +50,7 @@
                 v-if="editingId === asset.id"
                 v-model="editedValue"
                 type="number"
-                @keyup.enter="handleUpdateAsset(asset.id, asset.asset_type)"
+                @keyup.enter="handleUpdateAsset(asset.id)"
                 @blur="cancelEditing"
               />
               <span
@@ -56,7 +58,7 @@
                 :class="{
                   profit: asset.balance > 0,
                   loss: asset.balance < 0,
-                  neutral: asset.balance == 0,
+                  neutral: asset.balance === 0,
                 }"
                 @click="startEditing(asset.id, asset.balance)"
               >
@@ -75,7 +77,8 @@
       </table>
     </div>
 
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+    <!-- Create button, shows form and hides table -->
+    <button v-if="!showForm" @click="openForm" class="create-asset-button">
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
 
@@ -83,11 +86,13 @@
     <div v-if="showForm" class="asset-form">
       <label for="asset_type">Asset Type:</label>
       <input id="asset_type" v-model="newAssetType" placeholder="Enter asset type" />
+
       <label for="balance">Balance:</label>
       <input id="balance" v-model="newBalance" type="number" placeholder="Enter balance" />
+
       <div class="button-group">
         <button @click="createAsset">Create Asset</button>
-        <button @click="showForm = false" class="cancel-button">Cancel</button>
+        <button @click="closeForm" class="cancel-button">Cancel</button>
       </div>
     </div>
   </div>
@@ -108,18 +113,24 @@ const editedValue = ref('')
 const editingTypeId = ref(null)
 const editedTypeValue = ref('')
 
-// Form visibility toggle
+// Control visibility
 const showForm = ref(false)
+const showTable = ref(true)
 
-// Fetch data from API
+// Toggle form/table view
+const openForm = () => {
+  showForm.value = true
+  showTable.value = false
+}
+const closeForm = () => {
+  showForm.value = false
+  showTable.value = true
+}
+
 const fetchAssets = async () => {
   try {
     const response = await getAsset()
-    if (response && response.data) {
-      assets.value = response.data
-    } else {
-      console.error('Invalid API response', response)
-    }
+    assets.value = response?.data || []
   } catch (error) {
     console.error('Error fetching assets:', error)
   }
@@ -128,20 +139,17 @@ const fetchAssets = async () => {
 // Create asset API call
 const createAsset = async () => {
   if (!newAssetType.value || newBalance.value === '') {
-    alert(`Please enter both Asset Type and Balance!`)
+    alert('Please enter both Asset Type and Balance!')
     return
   }
-
   try {
     const response = await addAsset(newAssetType.value, parseFloat(newBalance.value))
-    if (response && response.data) {
-      assets.value.push(response.data)
-      newAssetType.value = ''
-      newBalance.value = ''
-      showForm.value = false
-    }
+    assets.value.push(response.data)
+    newAssetType.value = ''
+    newBalance.value = ''
+    closeForm()
   } catch (error) {
-    console.error('Error adding assets:', error)
+    console.error('Error adding asset:', error)
   }
 }
 
@@ -167,10 +175,8 @@ const handleUpdateAsset = async (asset_id, asset_type) => {
     alert('Please enter Balance!')
     return
   }
-
   try {
-    const updatedFields = { balance: parseFloat(editedValue.value) }
-    const response = await updateAsset(asset_id, updatedFields)
+    await updateAsset(asset_id, { balance: parseFloat(editedValue.value) })
     await fetchAssets()
   } catch (error) {
     console.error('Error updating asset balance:', error)
@@ -178,7 +184,6 @@ const handleUpdateAsset = async (asset_id, asset_type) => {
     editingId.value = null
   }
 }
-
 const cancelEditing = () => {
   editingId.value = null
 }
@@ -197,21 +202,19 @@ const handleUpdateAssetType = async (asset_id, balance) => {
   }
 
   try {
-    const updatedFields = { asset_type: editedTypeValue.value }
-    const response = await updateAsset(asset_id, updatedFields)
+    await updateAsset(asset_id, { asset_type: editedTypeValue.value })
     await fetchAssets()
   } catch (error) {
     console.error('Error updating asset type:', error)
   } finally {
-    editingId.value = null
+    editingTypeId.value = null
   }
 }
-
 const cancelEditingType = () => {
   editingTypeId.value = null
 }
 
-function safeNumber(val) {
+const safeNumber = (val) => {
   const n = Number(val)
   return isNaN(n) ? 0 : n
 }
@@ -219,19 +222,17 @@ function safeNumber(val) {
 const asset_sum = computed(() =>
   assets.value
     .filter((a) => safeNumber(a.balance) > 0)
-    .reduce((sum, a) => safeNumber(sum) + safeNumber(a.balance), 0)
+    .reduce((sum, a) => sum + safeNumber(a.balance), 0)
     .toFixed(2),
 )
-
 const liabilities_sum = computed(() =>
   assets.value
     .filter((a) => safeNumber(a.balance) < 0)
-    .reduce((sum, a) => safeNumber(sum) + Math.abs(safeNumber(a.balance)), 0)
+    .reduce((sum, a) => sum + Math.abs(safeNumber(a.balance)), 0)
     .toFixed(2),
 )
-
 const total = computed(() =>
-  assets.value.reduce((sum, a) => safeNumber(sum) + safeNumber(a.balance), 0).toFixed(2),
+  assets.value.reduce((sum, a) => sum + safeNumber(a.balance), 0).toFixed(2),
 )
 
 // Run on component mount

@@ -14,16 +14,8 @@
     </div>
     <!-- Container for the transaction table and filters -->
     <div class="table-container">
-      <!-- Buttons to filter transactions by type -->
-      <!-- <div class="filter-transaction-type">
-        <button @click="filterType = 'All'">All</button>
-        <button @click="filterType = 'Income'">Income</button>
-        <button @click="filterType = 'Expense'">Expense</button>
-        <button @click="filterType = 'InternalTransfer'">Internal Transfer</button>
-      </div> -->
-
-      <!-- Table to display paginated transactions -->
-      <table>
+      <!-- Table hidden when any form is visible -->
+      <table v-if="showTable">
         <colgroup>
           <col span="12" style="width: 8.3333%" />
         </colgroup>
@@ -136,7 +128,7 @@
     </div>
 
     <!-- Button to open create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-transaction-button">
+    <button v-if="showTable" @click="openForm" class="create-transaction-button">
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
 
@@ -147,13 +139,13 @@
       <button @click="toggleTransaction('internalTransfer')">Internal Transfer</button>
       <!-- Placeholder for future transfer feature -->
       <!-- <button @click="toggleTransaction('Transfer')">Transfer</button> -->
-      <button @click="toggleTransaction('')">Cancel</button>
+      <button @click="closeForm">Cancel</button>
     </div>
 
     <!-- ====================== Transaction Forms ======================= -->
     <div class="create-transaction-form">
       <!-- Income transaction form -->
-      <div v-if="showIncome" class="create-transaction-form-wrapper">
+      <div v-if="showIncome && showForm" class="create-transaction-form-wrapper">
         <h2>New Income Transaction</h2>
         <div class="form-group">
           <label for="amount">Amount</label>
@@ -185,7 +177,7 @@
       </div>
 
       <!-- Expense transaction form -->
-      <div v-if="showExpense" class="create-transaction-form-wrapper">
+      <div v-if="showExpense && showForm" class="create-transaction-form-wrapper">
         <h2>New Expense Transaction</h2>
 
         <div class="form-group">
@@ -218,7 +210,7 @@
       </div>
 
       <!-- Internal transfer transaction form -->
-      <div v-if="showInternalTransfer" class="create-transaction-form-wrapper">
+      <div v-if="showInternalTransfer && showForm" class="create-transaction-form-wrapper">
         <h2>New Internal Transfer Transaction</h2>
 
         <div class="form-group">
@@ -294,6 +286,31 @@ const showIncome = ref(false)
 const showExpense = ref(false)
 const showTransfer = ref(false)
 const showInternalTransfer = ref(false)
+
+// showTable is true when no form visible
+const showTable = computed(() => !showForm.value)
+
+// Opening and closing
+function openForm() {
+  showForm.value = true
+  showIncome.value = false
+  showExpense.value = false
+  showInternalTransfer.value = false
+}
+
+function closeForm() {
+  showForm.value = false
+  showIncome.value = false
+  showExpense.value = false
+  showInternalTransfer.value = false
+}
+
+function toggleTransaction(type) {
+  showIncome.value = type === 'income'
+  showExpense.value = type === 'expense'
+  showInternalTransfer.value = type === 'internalTransfer'
+  showForm.value = true
+}
 
 // === Form Fields for Creating Transaction ===
 const newAmount = ref('')
@@ -404,21 +421,6 @@ const filterType = ref('All')
 watch(filterType, () => {
   currentPage.value = 1
 })
-
-// === UI Transaction Type Toggle ===
-const toggleTransaction = (type) => {
-  showIncome.value = false
-  showExpense.value = false
-  showTransfer.value = false
-  showInternalTransfer.value = false
-  showForm.value = false
-
-  if (type === '') showForm.value = false
-  if (type === 'income') showIncome.value = true
-  if (type === 'expense') showExpense.value = true
-  if (type === 'Transfer') showTransfer.value = true
-  if (type === 'internalTransfer') showInternalTransfer.value = true
-}
 
 // === Fetch API Data ===
 const fetchTransactions = async () => {

@@ -2,7 +2,7 @@
   <div class="container">
     <!-- Table for displaying stock holdings -->
     <div class="table-container">
-      <table>
+      <table v-if="!showForm">
         <thead>
           <tr>
             <th>Stock</th>
@@ -132,7 +132,7 @@
     </div>
 
     <!-- Toggle create form -->
-    <button v-if="!showForm" @click="showForm = true" class="create-asset-button">
+    <button v-if="!showForm" @click="openForm" class="create-asset-button">
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
 
@@ -162,7 +162,7 @@
       <!-- Submit/cancel buttons -->
       <div class="button-group">
         <button @click="createHolding">Create</button>
-        <button @click="showForm = false" class="cancel-button">Cancel</button>
+        <button @click="closeForm" class="cancel-button">Cancel</button>
       </div>
     </div>
   </div>
@@ -184,6 +184,19 @@ const newQuantity = ref('')
 const newAveragePrice = ref('')
 const newCountry = ref('')
 const showForm = ref(false)
+
+function openForm() {
+  // 每次打開前先把欄位重置（若需要）
+  newTickerSymbol.value = ''
+  newQuantity.value = ''
+  newAveragePrice.value = ''
+  newCountry.value = ''
+  showForm.value = true
+}
+
+function closeForm() {
+  showForm.value = false
+}
 
 // Edit mode state
 const editedQuantity = ref('')
