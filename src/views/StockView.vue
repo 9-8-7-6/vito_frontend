@@ -16,8 +16,8 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Iterate through paginated data -->
-          <tr v-for="item in paginatedStockHoldings" :key="item.id">
+          <!-- Iterate through data -->
+          <tr v-for="item in stockHoldings" :key="item.id">
             <!-- Display stock symbol and company name -->
             <td>{{ `${item.ticker_symbol} (${item.company_name})` }}</td>
 
@@ -136,15 +136,6 @@
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
 
-    <!-- Pagination controls -->
-    <Pagination
-      :currentPage="currentPage"
-      :totalPages="totalPages"
-      :itemsPerPage="itemsPerPage"
-      @update:currentPage="(val) => (currentPage = val)"
-      @update:itemsPerPage="(val) => (itemsPerPage = val)"
-    />
-
     <!-- Form for adding new holding -->
     <div v-if="showForm" class="asset-form">
       <label for="country">Country:</label>
@@ -185,7 +176,6 @@ import {
   updateStockHolding,
   deleteStockHolding,
 } from '../api/stock'
-import Pagination from './Pagination.vue'
 
 // Reactive references for holding data and form inputs
 const stockHoldings = ref([])
@@ -201,19 +191,8 @@ const editedAveragePrice = ref('')
 const editingQuantityId = ref(null)
 const editingPriceId = ref(null)
 
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-
 // Calculate total number of pages
 const totalPages = computed(() => Math.ceil(stockHoldings.value.length / itemsPerPage.value))
-
-// Paginated subset of holdings to display
-const paginatedStockHoldings = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return stockHoldings.value.slice(start, end)
-})
 
 // Fetch stock holdings from API
 const fetchHoldings = async () => {

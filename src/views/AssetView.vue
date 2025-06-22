@@ -21,8 +21,8 @@
         </thead>
 
         <tbody>
-          <!-- Display paginated assets -->
-          <tr v-for="asset in paginatedAssets" :key="asset.id">
+          <!-- Display assets -->
+          <tr v-for="asset in assets" :key="asset.id">
             <!-- Asset type editing logic -->
             <td>
               <span
@@ -79,15 +79,6 @@
       <font-awesome-icon :icon="['fas', 'plus']" />
     </button>
 
-    <!-- Pagination controls -->
-    <Pagination
-      :currentPage="currentPage"
-      :totalPages="totalPages"
-      :itemsPerPage="itemsPerPage"
-      @update:currentPage="(val) => (currentPage = val)"
-      @update:itemsPerPage="(val) => (itemsPerPage = val)"
-    />
-
     <!-- New asset form -->
     <div v-if="showForm" class="asset-form">
       <label for="asset_type">Asset Type:</label>
@@ -105,7 +96,6 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
-import Pagination from './Pagination.vue'
 
 // State: Asset list and form inputs
 const assets = ref([])
@@ -120,18 +110,6 @@ const editedTypeValue = ref('')
 
 // Form visibility toggle
 const showForm = ref(false)
-
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const totalPages = computed(() => Math.ceil(assets.value.length / itemsPerPage.value))
-
-// Pagination logic
-const paginatedAssets = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return assets.value.slice(start, end)
-})
 
 // Fetch data from API
 const fetchAssets = async () => {
