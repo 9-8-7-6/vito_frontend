@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <!-- Password error message displayed atop the table -->
+    <p v-if="passwordError" class="error-msg">{{ passwordError }}</p>
+
     <div class="table-container">
       <table>
         <colgroup>
@@ -27,14 +30,26 @@
 
               <!-- Password Change Section -->
               <div v-if="showPasswordSection" class="password-wrapper">
-                <label for="password">New Password</label><br />
-                <input
-                  id="password"
-                  type="password"
-                  v-model="password"
-                  placeholder="Enter new password"
-                  class="password-input"
-                />
+                <div>
+                  <label for="newPassword">New Password</label><br />
+                  <input
+                    id="newPassword"
+                    type="password"
+                    v-model="password"
+                    placeholder="Enter new password"
+                    class="password-input"
+                  />
+                </div>
+                <div>
+                  <label for="confirmPassword">Confirm Password</label><br />
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    v-model="confirmPassword"
+                    placeholder="Re-enter new password"
+                    class="password-input"
+                  />
+                </div>
               </div>
               <!-- Country & Timezone Section -->
               <div v-if="showCountrySection">
@@ -76,7 +91,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { fetchCountries } from '../api/countries'
@@ -89,6 +103,8 @@ const countries = ref([])
 const country = ref('')
 const timezone = ref('')
 const password = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
 const showPasswordSection = ref(false)
 const showCountrySection = ref(false)
 
@@ -148,17 +164,33 @@ const fetchCountryList = async () => {
 // Submit updated country & timezone
 const handleUpdateUser = async () => {
   if (!user.value) return
+
   const fieldsToUpdate = {}
-  if (showPasswordSection.value && password.value) {
+
+  if (showPasswordSection.value) {
+    passwordError.value = ''
+    if (!password.value || !confirmPassword.value) {
+      passwordError.value = 'Please fill in both password fields.'
+      return
+    }
+    if (password.value !== confirmPassword.value) {
+      passwordError.value = 'Passwords do not match.'
+      return
+    }
     fieldsToUpdate.password = password.value
   }
+
   if (showCountrySection.value) {
     fieldsToUpdate.country = country.value
     fieldsToUpdate.timezone = timezone.value
   }
+
   try {
     await updateUserData(user.value.id, fieldsToUpdate)
+    // Reset
     password.value = ''
+    confirmPassword.value = ''
+    passwordError.value = ''
     showPasswordSection.value = false
     showCountrySection.value = false
   } catch (err) {
@@ -440,5 +472,20 @@ option {
     padding: 6px;
     font-size: 0.8rem;
   }
+}
+
+/* Moved passwordError above table and styled like error-msg */
+.error-msg {
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background-color: #ffe6e6;
+  color: #cc0000;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid #ff4d4d;
+  border-radius: 4px;
 }
 </style>
