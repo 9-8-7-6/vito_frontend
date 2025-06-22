@@ -11,10 +11,29 @@
         <input v-model="username" id="username" type="text" placeholder="Username" required />
       </div>
 
-      <!-- Password input -->
-      <div class="form-group">
+      <!-- Password input with press-and-hold to show toggle -->
+      <div class="form-group password-group">
         <label for="password" class="label">Password</label>
-        <input v-model="password" id="password" type="password" placeholder="Password" required />
+        <div class="password-wrapper">
+          <input
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            placeholder="Password"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            @mousedown="showPassword = true"
+            @mouseup="showPassword = false"
+            @mouseleave="showPassword = false"
+            @touchstart.prevent="showPassword = true"
+            @touchend="showPassword = false"
+          >
+            <font-awesome-icon :icon="['fas', 'eye']" />
+          </button>
+        </div>
       </div>
 
       <!-- Submit button -->
@@ -23,7 +42,7 @@
       <div class="action-section">
         <div class="action-links">
           <router-link to="/register" class="link-text">Register</router-link>
-          <router-link to="/login" class="link-text">Forget Password</router-link>
+          <router-link to="/forgot-password" class="link-text">Forget Password</router-link>
         </div>
       </div>
     </form>
@@ -44,12 +63,14 @@ const username = ref('')
 const password = ref('')
 const errorMessage = ref('')
 
+// Show password when pressing button
+const showPassword = ref(false)
+
 // Login handler
 const handleLogin = async () => {
   // Clear previous error
   errorMessage.value = ''
   try {
-    // Attempt to log in via the store
     const success = await authStore.login({ username: username.value, password: password.value })
     if (success) {
       router.push('/')
@@ -99,6 +120,41 @@ form {
 .form-group {
   display: flex;
   flex-direction: column;
+}
+
+.password-group {
+  position: relative;
+}
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper {
+  position: relative;
+}
+.password-wrapper input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  padding-right: 2.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #6a6363;
+  padding: 2px 4px;
+}
+.toggle-password:active {
+  color: black;
 }
 
 input {
