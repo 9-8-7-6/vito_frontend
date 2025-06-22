@@ -2,49 +2,73 @@
   <div class="container">
     <div class="table-container">
       <table>
+        <colgroup>
+          <col />
+          <col />
+          <col style="width: 200px" />
+        </colgroup>
         <thead>
           <tr>
             <th>Username</th>
             <th>Email</th>
-            <th>Country</th>
+            <th>Settings</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Display user info once loaded -->
           <tr v-if="user">
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>
-              <!-- Country dropdown -->
-              <select v-model="country" class="select-box">
-                <option disabled value="">
-                  {{ country || 'Please Select Country' }}
-                </option>
-                <option v-for="c in countries" :key="c.code" :value="c.name">
-                  {{ c.name }}
-                </option>
-              </select>
+              <!-- Toggle Buttons -->
+              <div class="button-group">
+                <button @click="toggleSection('password')">Password Change</button>
+                <button @click="toggleSection('country')">Country Setting</button>
+              </div>
 
-              <!-- Timezone dropdown (only if country has timezones) -->
-              <select
-                v-if="timezones.length > 0"
-                v-model="timezone"
-                class="select-box"
-                style="margin-left: 10px"
+              <!-- Password Change Section -->
+              <div v-if="showPasswordSection" class="password-wrapper">
+                <label for="password">New Password</label><br />
+                <input
+                  id="password"
+                  type="password"
+                  v-model="password"
+                  placeholder="Enter new password"
+                  class="password-input"
+                />
+              </div>
+              <!-- Country & Timezone Section -->
+              <div v-if="showCountrySection">
+                <select v-model="country" class="select-box">
+                  <option disabled value="">
+                    {{ country || 'Please Select Country' }}
+                  </option>
+                  <option v-for="c in countries" :key="c.code" :value="c.name">
+                    {{ c.name }}
+                  </option>
+                </select>
+
+                <select
+                  v-if="timezones.length > 0"
+                  v-model="timezone"
+                  class="select-box country-select"
+                >
+                  <option disabled value="">
+                    {{ timezone || 'Please Select Timezone' }}
+                  </option>
+                  <option v-for="tz in timezones" :key="tz" :value="tz">
+                    {{ tz }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Update Button -->
+              <button
+                v-if="showPasswordSection || showCountrySection"
+                @click="handleUpdateUser"
+                class="update-button"
               >
-                <option disabled value="">
-                  {{ timezone || 'Please Select Timezone' }}
-                </option>
-                <option v-for="tz in timezones" :key="tz" :value="tz">
-                  {{ tz }}
-                </option>
-              </select>
-
-              <!-- Display selected timezone -->
-              <div v-if="timezone" style="margin-top: 10px">TimeZone: {{ timezone }}</div>
-
-              <!-- Update button -->
-              <button @click="handleUpdateUser" style="margin-top: 10px">Update User Info</button>
+                Update User Info
+              </button>
             </td>
           </tr>
         </tbody>
@@ -64,6 +88,9 @@ const user = ref(null)
 const countries = ref([])
 const country = ref('')
 const timezone = ref('')
+const password = ref('')
+const showPasswordSection = ref(false)
+const showCountrySection = ref(false)
 
 // Computed: find country object based on selected name
 const selectedCountry = computed(() => {
@@ -75,6 +102,16 @@ const timezones = computed(() => {
   return selectedCountry.value?.timezone || []
 })
 
+function toggleSection(section) {
+  if (section === 'password') {
+    showPasswordSection.value = !showPasswordSection.value
+    showCountrySection.value = false
+  } else if (section === 'country') {
+    showCountrySection.value = !showCountrySection.value
+    showPasswordSection.value = false
+  }
+}
+
 // Load user and country info
 const fetchUser = async () => {
   const response = await getUserData()
@@ -83,7 +120,7 @@ const fetchUser = async () => {
   // Load countries
   await fetchCountryList()
 
-  // Restore from cookie (if any)
+  // Restore from cookie
   const savedCountry = getCookie('user-country')
   const savedTimezone = getCookie('user-timezone')
 
@@ -111,14 +148,19 @@ const fetchCountryList = async () => {
 // Submit updated country & timezone
 const handleUpdateUser = async () => {
   if (!user.value) return
-
-  const fieldsToUpdate = {
-    country: country.value,
-    timezone: timezone.value,
+  const fieldsToUpdate = {}
+  if (showPasswordSection.value && password.value) {
+    fieldsToUpdate.password = password.value
   }
-
+  if (showCountrySection.value) {
+    fieldsToUpdate.country = country.value
+    fieldsToUpdate.timezone = timezone.value
+  }
   try {
-    const response = await updateUserData(user.value.id, fieldsToUpdate)
+    await updateUserData(user.value.id, fieldsToUpdate)
+    password.value = ''
+    showPasswordSection.value = false
+    showCountrySection.value = false
   } catch (err) {
     console.error('Failed to update user:', err)
     alert('Failed to update user info')
@@ -267,9 +309,37 @@ td {
 
 .button-group {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.password-wrapper {
+  margin-bottom: 10px;
+}
+.password-input,
+.select-box,
+.country-select {
+  width: 180px;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+}
+.country-select {
+  margin-left: 10px;
+}
+.update-button {
   margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+.update-button:hover {
+  background-color: #0056b3;
 }
 
 .cancel-button {
@@ -334,6 +404,20 @@ td {
 
 option {
   background-color: #1e1e1e;
+  color: #ffffffd4;
+}
+
+.password-wrapper {
+  margin-bottom: 10px;
+}
+
+.password-input {
+  width: 180px;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #333;
   color: #fff;
 }
 

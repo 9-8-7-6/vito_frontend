@@ -411,6 +411,7 @@ const toggleTransaction = (type) => {
   showExpense.value = false
   showTransfer.value = false
   showInternalTransfer.value = false
+  showForm.value = false
 
   if (type === '') showForm.value = false
   if (type === 'income') showIncome.value = true
