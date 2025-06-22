@@ -21,6 +21,10 @@
 
       <!-- Submit button -->
       <button type="submit">Register</button>
+
+      <div class="action-links">
+        <router-link to="/login" class="link-text">Login</router-link>
+      </div>
     </form>
   </div>
 </template>
@@ -108,5 +112,22 @@ button:hover {
   font-weight: bold;
   color: #333;
   margin-bottom: 5px;
+}
+
+.action-links {
+  display: flex;
+  justify-content: center;
+}
+
+.link-text {
+  font-size: 14px;
+  color: #30363d;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.link-text:hover {
+  color: #0056b3;
 }
 </style>

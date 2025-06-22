@@ -203,6 +203,38 @@ onBeforeUnmount(() => {
   background-color: #f0f0f0;
 }
 
+.dropdown.resources {
+  background-color: #434044;
+  border: 1px solid #212222;
+}
+
+.dropdown.resources .dropdown-item {
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+.dropdown.resources .dropdown-item:focus {
+  outline: none;
+}
+
+.dropdown.resources .dropdown-item {
+  color: #ecf0f1;
+  transition: background 0.2s;
+}
+
+.dropdown.resources .dropdown-item:hover {
+  background-color: #414344;
+  color: #fff;
+}
+
+.dropdown.resources .dropdown-item + .dropdown-item {
+  border-top: 1px solid #1a252f;
+}
+
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;

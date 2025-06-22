@@ -16,6 +16,11 @@
 
       <!-- Submit button -->
       <button type="submit">Login</button>
+
+      <div class="action-links">
+        <router-link to="/register" class="link-text">Register</router-link>
+        <router-link to="/login" class="link-text">Forget Password</router-link>
+      </div>
     </form>
   </div>
 </template>
@@ -99,5 +104,23 @@ button:hover {
   font-weight: bold;
   color: #333;
   margin-bottom: 5px;
+}
+
+.action-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.link-text {
+  font-size: 14px;
+  color: #30363d;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.link-text:hover {
+  color: #0056b3;
 }
 </style>

@@ -984,7 +984,6 @@ td {
   justify-content: center;
   align-items: center;
   height: 3rem;
-  background: #f5f5f5;
   user-select: none;
 }
 
