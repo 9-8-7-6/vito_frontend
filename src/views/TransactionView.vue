@@ -118,9 +118,10 @@
                 />
               </td>
               <td colspan="3">
-                <button class="action-button" @click="handleDeleteTransaction(transaction.id)">
-                  <font-awesome-icon :icon="['fas', 'trash']" />
-                </button>
+                <IconButton
+                  :icon="['fas', 'trash']"
+                  @click="() => handleDeleteTransaction(transaction.id)"
+                />
               </td>
             </tr>
           </template>
@@ -281,6 +282,7 @@ import {
   deleteTransaction,
   updateTransaction,
 } from '../api/transaction'
+import IconButton from '@/components/IconButton.vue'
 import { getAsset } from '../api/asset'
 
 // === UI State ===
@@ -804,15 +806,6 @@ td {
 }
 
 .create-transaction-button:hover {
-  background-color: #c9302c;
-}
-
-/* === delete button === */
-.action-button {
-  background-color: #d9534f;
-  padding: 5px 10px;
-}
-.action-button:hover {
   background-color: #c9302c;
 }
 

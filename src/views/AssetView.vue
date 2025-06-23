@@ -68,9 +68,7 @@
 
             <!-- Delete button -->
             <td>
-              <button class="action-button" @click="handleDeleteAsset(asset.id)">
-                <font-awesome-icon :icon="['fas', 'trash']" />
-              </button>
+              <IconButton :icon="['fas', 'trash']" @click="() => handleDeleteAsset(asset.id)" />
             </td>
           </tr>
         </tbody>
@@ -101,6 +99,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
+import IconButton from '@/components/IconButton.vue'
 
 // State: Asset list and form inputs
 const assets = ref([])
@@ -332,17 +331,6 @@ th {
 
 td {
   text-align: center;
-}
-
-.action-button {
-  background-color: #d9534f;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-
-.action-button:hover {
-  background-color: #c9302c;
 }
 
 .asset-type-button,

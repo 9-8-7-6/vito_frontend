@@ -122,9 +122,7 @@
 
             <!-- Delete button -->
             <td>
-              <button class="action-button" @click="handleDeleteHolding(item.id)">
-                <font-awesome-icon :icon="['fas', 'trash']" />
-              </button>
+              <IconButton :icon="['fas', 'trash']" @click="() => handleDeleteHolding(item.id)" />
             </td>
           </tr>
         </tbody>
@@ -176,6 +174,7 @@ import {
   updateStockHolding,
   deleteStockHolding,
 } from '../api/stock'
+import IconButton from '@/components/IconButton.vue'
 
 // Reactive references for holding data and form inputs
 const stockHoldings = ref([])
@@ -406,17 +405,6 @@ th {
 
 td {
   text-align: center;
-}
-
-.action-button {
-  background-color: #d9534f;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-
-.action-button:hover {
-  background-color: #c9302c;
 }
 
 .asset-type-button,
