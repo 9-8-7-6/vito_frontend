@@ -68,7 +68,20 @@
 
             <!-- Delete button -->
             <td>
-              <IconButton :icon="['fas', 'trash']" @click="() => handleDeleteAsset(asset.id)" />
+              <IconButton
+                :icon="['fas', 'trash']"
+                @click="
+                  () => {
+                    deletingId = asset.id
+                    showConfirm = true
+                  }
+                "
+              />
+              <ConfirmDialog
+                v-if="showConfirm"
+                @confirm="onConfirmDelete"
+                @cancel="showConfirm = false"
+              />
             </td>
           </tr>
         </tbody>
@@ -100,6 +113,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
 import IconButton from '@/components/IconButton.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 // State: Asset list and form inputs
 const assets = ref([])
@@ -115,6 +129,14 @@ const editedTypeValue = ref('')
 // Control visibility
 const showForm = ref(false)
 const showTable = ref(true)
+const showConfirm = ref(false)
+const deletingId = ref(null)
+
+const onConfirmDelete = async () => {
+  showConfirm.value = false
+  await handleDeleteAsset(deletingId.value)
+  deletingId.value = null
+}
 
 // Toggle form/table view
 const openForm = () => {

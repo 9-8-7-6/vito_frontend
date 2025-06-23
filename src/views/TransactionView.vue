@@ -120,7 +120,17 @@
               <td colspan="3">
                 <IconButton
                   :icon="['fas', 'trash']"
-                  @click="() => handleDeleteTransaction(transaction.id)"
+                  @click="
+                    () => {
+                      deletingId = transaction.id
+                      showConfirm = true
+                    }
+                  "
+                />
+                <ConfirmDialog
+                  v-if="showConfirm"
+                  @confirm="onConfirmDelete"
+                  @cancel="showConfirm = false"
                 />
               </td>
             </tr>
@@ -283,6 +293,7 @@ import {
   updateTransaction,
 } from '../api/transaction'
 import IconButton from '@/components/IconButton.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { getAsset } from '../api/asset'
 
 // === UI State ===
@@ -294,6 +305,14 @@ const showInternalTransfer = ref(false)
 
 // showTable is true when no form visible
 const showTable = computed(() => !showForm.value)
+const showConfirm = ref(false)
+const deletingId = ref(null)
+
+const onConfirmDelete = async () => {
+  showConfirm.value = false
+  await handleDeleteTransaction(deletingId.value)
+  deletingId.value = null
+}
 
 // Opening and closing
 function openForm() {
@@ -584,7 +603,7 @@ const createTransactionInternalTransfer = async () => {
 // === Delete Transaction ===
 const handleDeleteTransaction = async (transaction_id) => {
   try {
-    const response = await deleteTransaction(transaction_id)
+    await deleteTransaction(transaction_id)
     await fetchTransactions()
   } catch (error) {
     console.error('Error deleting transaction:', error)

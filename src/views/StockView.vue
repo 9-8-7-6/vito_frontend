@@ -122,7 +122,20 @@
 
             <!-- Delete button -->
             <td>
-              <IconButton :icon="['fas', 'trash']" @click="() => handleDeleteHolding(item.id)" />
+              <IconButton
+                :icon="['fas', 'trash']"
+                @click="
+                  () => {
+                    deletingId = item.id
+                    showConfirm = true
+                  }
+                "
+              />
+              <ConfirmDialog
+                v-if="showConfirm"
+                @confirm="onConfirmDelete"
+                @cancel="showConfirm = false"
+              />
             </td>
           </tr>
         </tbody>
@@ -175,6 +188,7 @@ import {
   deleteStockHolding,
 } from '../api/stock'
 import IconButton from '@/components/IconButton.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 // Reactive references for holding data and form inputs
 const stockHoldings = ref([])
@@ -183,6 +197,14 @@ const newQuantity = ref('')
 const newAveragePrice = ref('')
 const newCountry = ref('')
 const showForm = ref(false)
+const showConfirm = ref(false)
+const deletingId = ref(null)
+
+const onConfirmDelete = async () => {
+  showConfirm.value = false
+  await handleDeleteHolding(deletingId.value)
+  deletingId.value = null
+}
 
 function openForm() {
   // 每次打開前先把欄位重置（若需要）
