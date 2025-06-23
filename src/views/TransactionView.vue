@@ -9,8 +9,12 @@
       @pointerup="onPointerUp"
       @pointercancel="onPointerUp"
     >
-      <div class="month-display">
-        {{ months[currentMonthIndex] }}
+      <div v-if="showTable" class="month-switcher-swipe">
+        <button class="nav-btn left" @click.stop="prevMonth">&lt;</button>
+        <div class="month-display">
+          {{ months[currentMonthIndex] }}
+        </div>
+        <button class="nav-btn right" @click.stop="nextMonth">&gt;</button>
       </div>
     </div>
     <!-- Container for the transaction table and filters -->
@@ -570,6 +574,10 @@ const createTransactionInternalTransfer = async () => {
     return
   }
 
+  if (newFromAssetId.value === newToAssetId.value) {
+    alert('Internal transfers must involve two different assets. Please choose distinct assets.')
+  }
+
   let isoString = newTransactionTime.value ? new Date(newTransactionTime.value).toISOString() : null
 
   try {
@@ -679,19 +687,27 @@ const groupedByMonth = computed(() => {
     .sort((a, b) => (a.month > b.month ? -1 : 1))
 })
 
-const months = computed(() => groupedByMonth.value.map((g) => g.month))
+const months = computed(() => {
+  const list = groupedByMonth.value.map((g) => g.month)
+  const today = dayjs().format('YYYY-MM')
+  if (!list.includes(today)) {
+    list.unshift(today)
+  }
+  return list
+})
 const currentMonthIndex = ref(0)
 const selectedMonth = ref('')
 watch(currentMonthIndex, (idx) => {
   selectedMonth.value = months.value[idx]
 })
 
-watch(months, (list) => {
-  if (list.length) {
-    currentMonthIndex.value = 0
-    selectedMonth.value = list[0]
-  }
-})
+function prevMonth() {
+  currentMonthIndex.value = Math.min(months.value.length - 1, currentMonthIndex.value + 1)
+}
+
+function nextMonth() {
+  currentMonthIndex.value = Math.max(0, currentMonthIndex.value - 1)
+}
 
 let startX = 0
 
@@ -714,12 +730,20 @@ function onPointerUp(e) {
   e.target.releasePointerCapture(e.pointerId)
 }
 
-watch(months, (list) => {
-  if (list.length > 0) {
-    currentMonthIndex.value = 0
-    selectedMonth.value = list[0]
-  }
-})
+watch(
+  months,
+  (list) => {
+    if (list.length === 0) return
+
+    const todayMonth = dayjs().format('YYYY-MM')
+
+    const idx = list.findIndex((m) => m === todayMonth)
+    currentMonthIndex.value = idx !== -1 ? idx : 0
+
+    selectedMonth.value = list[currentMonthIndex.value]
+  },
+  { immediate: true }
+)
 
 // === Initial Data Load on Mount ===
 onMounted(async () => {
@@ -734,6 +758,7 @@ onMounted(async () => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  touch-action: pan-y;
 }
 
 /* === filter buttons === */
@@ -1009,13 +1034,20 @@ td {
 }
 
 .month-switcher-swipe {
-  overflow: hidden;
-  touch-action: pan-y;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
   height: 3rem;
+  padding: 0 1rem;
   user-select: none;
+}
+
+.nav-btn {
+  background-color: rgb(38, 35, 35);
+}
+
+.nav-btn:hover {
+  background-color: rgb(67, 65, 65);
 }
 
 .month-display {
