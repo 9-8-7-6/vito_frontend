@@ -159,7 +159,7 @@
     <!-- ====================== Transaction Forms ======================= -->
     <div class="create-transaction-form">
       <!-- Income transaction form -->
-      <div v-if="showIncome && showForm" class="create-transaction-form-wrapper">
+      <div v-if="showIncome" class="create-transaction-form-wrapper">
         <h2>New Income Transaction</h2>
         <div class="form-group">
           <label for="amount">Amount</label>
@@ -191,7 +191,7 @@
       </div>
 
       <!-- Expense transaction form -->
-      <div v-if="showExpense && showForm" class="create-transaction-form-wrapper">
+      <div v-if="showExpense" class="create-transaction-form-wrapper">
         <h2>New Expense Transaction</h2>
 
         <div class="form-group">
@@ -224,7 +224,7 @@
       </div>
 
       <!-- Internal transfer transaction form -->
-      <div v-if="showInternalTransfer && showForm" class="create-transaction-form-wrapper">
+      <div v-if="showInternalTransfer" class="create-transaction-form-wrapper">
         <h2>New Internal Transfer Transaction</h2>
 
         <div class="form-group">
@@ -304,7 +304,7 @@ const showTransfer = ref(false)
 const showInternalTransfer = ref(false)
 
 // showTable is true when no form visible
-const showTable = computed(() => !showForm.value)
+const showTable = ref(true)
 const showConfirm = ref(false)
 const deletingId = ref(null)
 
@@ -316,6 +316,7 @@ const onConfirmDelete = async () => {
 
 // Opening and closing
 function openForm() {
+  showTable.value = false
   showForm.value = true
   showIncome.value = false
   showExpense.value = false
@@ -323,17 +324,16 @@ function openForm() {
 }
 
 function closeForm() {
+  showTable.value = true
   showForm.value = false
-  showIncome.value = false
-  showExpense.value = false
-  showInternalTransfer.value = false
 }
 
 function toggleTransaction(type) {
   showIncome.value = type === 'income'
   showExpense.value = type === 'expense'
   showInternalTransfer.value = type === 'internalTransfer'
-  showForm.value = true
+  showForm.value = false
+  showTable.value = type === 'cancel' || type === ''
 }
 
 // === Form Fields for Creating Transaction ===
@@ -508,6 +508,7 @@ const createTransactionIncome = async () => {
       showIncome.value = false
       showForm.value = false
       showIncome.value = false
+      showTable.value = true
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -547,6 +548,7 @@ const createTransactionExpense = async () => {
       showIncome.value = false
       showForm.value = false
       showExpense.value = false
+      showTable.value = true
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
@@ -590,6 +592,7 @@ const createTransactionInternalTransfer = async () => {
       newNotes.value = ''
       showForm.value = false
       showInternalTransfer.value = false
+      showTable.value = true
       await fetchTransactions()
     } else {
       alert('Failed to add transaction.')
