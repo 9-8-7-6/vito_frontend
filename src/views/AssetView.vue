@@ -112,6 +112,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
+import { fetchStockHoldingsByAccount } from '../api/stock'
 import IconButton from '@/components/IconButton.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
@@ -154,7 +155,30 @@ const fetchAssets = async () => {
   try {
     const response = await getAsset()
     assets.value = response?.data || []
-    assets.value.sort((a, b) => b.balance - a.balance)
+
+    const stock_response = await fetchStockHoldingsByAccount()
+    const stockData = stock_response?.data || []
+
+    let stockTotal = 0
+    for (const stock of stockData) {
+      const price = parseFloat(stock.current_price)
+      const quantity = parseFloat(stock.quantity)
+      stockTotal += price * quantity
+    }
+
+    const stockAsset = {
+      id: 'virtual-stock-asset',
+      account_id: stockData[0]?.account_id ?? '',
+      asset_type: '台股',
+      balance: stockTotal.toFixed(2),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    assets.value.push(stockAsset)
+
+    // Order（High → Low）
+    assets.value.sort((a, b) => parseFloat(b.balance) - parseFloat(a.balance))
     sortDesc.value = true
   } catch (error) {
     console.error('Error fetching assets:', error)
