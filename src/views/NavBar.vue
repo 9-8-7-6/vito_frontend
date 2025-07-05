@@ -36,6 +36,14 @@
           Stock
         </router-link>
         <router-link
+          v-if="authStore.userId"
+          to="/currency-holding"
+          class="dropdown-item"
+          @click="showResources = false"
+        >
+          Currency
+        </router-link>
+        <router-link
           v-if="!authStore.userId"
           to="/register"
           class="dropdown-item"

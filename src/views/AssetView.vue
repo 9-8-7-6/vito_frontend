@@ -113,6 +113,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
 import { fetchStockHoldingsByAccount } from '../api/stock'
+import { fetchCurrencyHoldingsByAccount } from '../api/currency_holding.ts'
 import IconButton from '@/components/IconButton.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
@@ -156,16 +157,22 @@ const fetchAssets = async () => {
     const response = await getAsset()
     assets.value = response?.data || []
 
+    // Stock holdings
     const stock_response = await fetchStockHoldingsByAccount()
     const stockData = stock_response?.data || []
+
+    // Currency holdings
+    const Currency_holding_response = await fetchCurrencyHoldingsByAccount()
+    const CurrencyHoldingData = Currency_holding_response || []
 
     let stockTotal = 0
     for (const stock of stockData) {
       const price = parseFloat(stock.current_price)
       const quantity = parseFloat(stock.quantity)
-      stockTotal += price * quantity
+      stockTotal += price * quantity * 0.995575
     }
 
+    // Create virtual asset for stock
     const stockAsset = {
       id: 'virtual-stock-asset',
       account_id: stockData[0]?.account_id ?? '',
@@ -177,7 +184,25 @@ const fetchAssets = async () => {
 
     assets.value.push(stockAsset)
 
-    // Order（High → Low）
+    // Convert each currency holding into a virtual asset
+    console.log(CurrencyHoldingData)
+    console.log(Currency_holding_response)
+    for (const currency of CurrencyHoldingData) {
+      console.log(currency)
+      const average_cost_per_unit = parseFloat(currency.average_cost_per_unit)
+      const amount = parseFloat(currency.amount_held)
+      const currencyAsset = {
+        id: `virtual-currency-${currency.currency_code}`,
+        account_id: currency.account_id ?? '',
+        asset_type: `Currency - ${currency.currency_code} (${amount.toFixed(2)})`,
+        balance: (amount * average_cost_per_unit).toFixed(2),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      assets.value.push(currencyAsset)
+    }
+
+    // Sort by balance (high to low)
     assets.value.sort((a, b) => parseFloat(b.balance) - parseFloat(a.balance))
     sortDesc.value = true
   } catch (error) {

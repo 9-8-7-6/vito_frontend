@@ -9,6 +9,7 @@ import Asset from '../views/AssetView.vue'
 import Stock from '../views/StockView.vue'
 import Setting from '../views/SettingView.vue'
 import Transaction from '../views/TransactionView.vue'
+import CurrencyHolding from '../views/CurrencyHoldingView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -45,6 +46,12 @@ const routes = [
     name: 'Transaction',
     component: Transaction,
     meta: { requiresAuth: true, title: 'Transaction - Vito' },
+  },
+  {
+    path: '/currency-holding',
+    name: 'Currency holding',
+    component: CurrencyHolding,
+    meta: { requiresAuth: true, title: 'Currency - Vito' },
   },
 ]
 

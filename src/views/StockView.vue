@@ -153,7 +153,6 @@
       <select id="country" v-model="newCountry">
         <option disabled value="" hidden>Select Country</option>
         <option value="TW">Taiwan</option>
-        <option value="US">United States</option>
       </select>
 
       <label for="ticker_symbol">Ticker Symbol:</label>
