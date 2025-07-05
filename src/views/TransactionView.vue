@@ -742,7 +742,7 @@ watch(
 
     selectedMonth.value = list[currentMonthIndex.value]
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // === Initial Data Load on Mount ===

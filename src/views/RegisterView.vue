@@ -57,7 +57,7 @@ const handleRegister = async () => {
     // Handle registration failure
     console.error(error)
     const errorMessage = error.response?.data?.message || error.message || 'Unknown Error'
-    alert(`Register failed. Please check your input.\nError message: ${errorMessage}`)
+    alert(`${errorMessage}`)
   }
 }
 </script>

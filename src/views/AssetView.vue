@@ -9,7 +9,7 @@
               <div>Assets</div>
               <div class="profit">{{ asset_sum }}</div>
             </th>
-            <th>
+            <th @click="reverseAssetOrder">
               <div>Liabilities</div>
               <div class="loss">{{ liabilities_sum }}</div>
             </th>
@@ -148,13 +148,22 @@ const closeForm = () => {
   showTable.value = true
 }
 
+const sortDesc = ref(true)
+
 const fetchAssets = async () => {
   try {
     const response = await getAsset()
     assets.value = response?.data || []
+    assets.value.sort((a, b) => b.balance - a.balance)
+    sortDesc.value = true
   } catch (error) {
     console.error('Error fetching assets:', error)
   }
+}
+
+const reverseAssetOrder = async () => {
+  assets.value.sort((a, b) => (sortDesc.value ? b.balance - a.balance : a.balance - b.balance))
+  sortDesc.value = !sortDesc.value
 }
 
 // Create asset API call
