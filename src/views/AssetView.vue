@@ -113,7 +113,8 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getAsset, addAsset, deleteAsset, updateAsset } from '../api/asset'
 import { fetchStockHoldingsByAccount } from '../api/stock'
-import { fetchCurrencyHoldingsByAccount } from '../api/currency_holding.ts'
+import { fetchCurrencyHoldingsByAccount } from '../api/currency_holding'
+import { currencyScraper } from '../api/currency_crawer'
 import IconButton from '@/components/IconButton.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
@@ -184,18 +185,19 @@ const fetchAssets = async () => {
 
     assets.value.push(stockAsset)
 
+    const currencyCodes = CurrencyHoldingData.map((c) => c.currency_code)
+    const exchangeMap = await currencyScraper(currencyCodes)
+
     // Convert each currency holding into a virtual asset
-    console.log(CurrencyHoldingData)
-    console.log(Currency_holding_response)
     for (const currency of CurrencyHoldingData) {
-      console.log(currency)
-      const average_cost_per_unit = parseFloat(currency.average_cost_per_unit)
+      const code = currency.currency_code
+      const current_price_per_unit = exchangeMap[code] ?? 0
       const amount = parseFloat(currency.amount_held)
       const currencyAsset = {
-        id: `virtual-currency-${currency.currency_code}`,
+        id: `virtual-currency-${code}`,
         account_id: currency.account_id ?? '',
-        asset_type: `Currency - ${currency.currency_code} (${amount.toFixed(2)})`,
-        balance: (amount * average_cost_per_unit).toFixed(2),
+        asset_type: `Currency - ${code} (${amount.toFixed(2)})`,
+        balance: (amount * current_price_per_unit).toFixed(2),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }

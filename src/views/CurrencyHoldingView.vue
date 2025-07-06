@@ -5,19 +5,16 @@
       <table v-if="!showForm">
         <thead>
           <tr>
-            <th>Country</th>
-            <th>Currency Code</th>
-            <th>Amount Held</th>
-            <th>Average Cost/Unit</th>
+            <th>Currency Code(Amount Held)</th>
+            <th>Current price</th>
+            <th>Average Cost</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in currencyHoldings" :key="item.id">
-            <td>{{ item.country }}</td>
-            <td>{{ item.currency_code }}</td>
             <td>
-              <input
+              {{ item.currency_code }} (<input
                 v-if="editingAmountHeldId === item.id"
                 v-model="editedAmountHeld"
                 type="number"
@@ -29,8 +26,11 @@
                 class="editable-button"
                 @click="startEditingAmountHeld(item.id, item.amount_held)"
               >
-                {{ Number(item.amount_held).toFixed(2) }}
-              </span>
+                {{ Number(item.amount_held).toFixed(2) }} </span
+              >)
+            </td>
+            <td>
+              {{ Number(item.current_price_per).toFixed(4) }}
             </td>
             <td>
               <input
@@ -113,6 +113,7 @@ import {
   updateCurrencyHolding,
   deleteCurrencyHolding,
 } from '../api/currency_holding.ts'
+import { currencyScraper } from '../api/currency_crawer'
 import IconButton from '@/components/IconButton.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
@@ -144,11 +145,32 @@ const editingAverageCostId = ref(null)
 const fetchHoldings = async () => {
   try {
     const data = await fetchCurrencyHoldingsByAccount()
-    if (data) {
-      currencyHoldings.value = data
+
+    if (!data || data.length === 0) {
+      currencyHoldings.value = []
+      return
     }
+
+    const codes = data.map((item) => item.currency_code)
+    const exchangeRates = await currencyScraper(codes)
+
+    const enrichedHoldings = data.map((item) => {
+      const code = item.currency_code
+      const amount = parseFloat(item.amount_held)
+      const rate = exchangeRates[code] ?? 0
+      const current_price_per_unit = parseFloat((amount * rate).toFixed(2))
+
+      return {
+        ...item,
+        exchange_rate: rate,
+        current_price_per: current_price_per_unit,
+      }
+    })
+
+    currencyHoldings.value = enrichedHoldings
   } catch (error) {
     console.error('Error fetching currency holdings:', error)
+    currencyHoldings.value = []
   }
 }
 
