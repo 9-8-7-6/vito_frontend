@@ -23,3 +23,28 @@ cd vito_frontend
 chmod +x ./generate_env.sh
 ./generate_env.sh
 docker compose up -d
+
+```
+
+## 📌 資料來源與免責聲明
+
+本專案透過前端程式碼擷取以下網站的幣別與參考匯率資料：
+
+> [國泰世華商業銀行 - 外幣匯率看板](https://www.cathaybk.com.tw/cathaybk/personal/product/deposit/currency-billboard/)
+
+- 本資料非官方 API，僅供技術學習與展示用途。
+- 所有資料版權與解釋權歸國泰世華商業銀行所有。
+- 若您為資料來源擁有者並希望我們停止擷取，請透過 GitHub 聯繫我們，我們會立即配合下架。
+
+## 📌 Data Source & Disclaimer
+
+This project fetches currency reference rates from:
+
+> [Cathay United Bank – Currency Billboard](https://www.cathaybk.com.tw/cathaybk/personal/product/deposit/currency-billboard/)
+
+Currency data (such as USD buy rate) is scraped from publicly visible HTML using frontend logic.
+
+- This is **not** an official API or data feed.
+- All rights and copyright of the data belong to **Cathay United Bank Co., Ltd.**
+- This project is for **educational and non-commercial purposes** only.
+- If you are a representative of the original data provider and wish us to remove or stop referencing your content, please contact us via GitHub and we will comply immediately.

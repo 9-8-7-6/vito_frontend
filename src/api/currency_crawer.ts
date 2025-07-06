@@ -1,3 +1,14 @@
+/**
+ * 匯率資料來源：
+ * 本模組所取得之幣別及參考匯率資料，來源為國泰世華商業銀行股份有限公司官方網站
+ * (https://www.cathaybk.com.tw/cathaybk/personal/product/deposit/currency-billboard/)
+ *
+ * 本程式僅用於技術學習或展示用途，非作為正式金融資訊之依據。
+ * 所有匯率資料之版權及最終解釋權歸原網站所有。
+ *
+ * 若您為原網站管理者並希望我們停止引用資料，請透過項目頁面聯繫我們，我們將立即配合下架。
+ */
+
 type CurrencyMap = Record<string, number>
 
 export async function currencyScraper(codes: string[]): Promise<CurrencyMap> {
