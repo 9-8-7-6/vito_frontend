@@ -177,7 +177,7 @@ const fetchAssets = async () => {
     const stockAsset = {
       id: 'virtual-stock-asset',
       account_id: stockData[0]?.account_id ?? '',
-      asset_type: '台股',
+      asset_type: 'Stock - TW',
       balance: stockTotal.toFixed(2),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

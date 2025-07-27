@@ -384,9 +384,9 @@ const groupedTransactionsRaw = computed(() => {
 })
 
 const groupedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return groupedTransactionsRaw.value.slice(start, end)
+  return groupedTransactionsRaw.value.filter(
+    ([d]) => dayjs(d).format('YYYY-MM') === selectedMonth.value,
+  )
 })
 
 const dailyTotals = computed(() => {

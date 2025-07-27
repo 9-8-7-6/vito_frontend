@@ -6,8 +6,8 @@
         <thead>
           <tr>
             <th>Currency Code(Amount Held)</th>
-            <th>Current price</th>
-            <th>Average Cost</th>
+            <th>Current price / Average cost</th>
+            <th>Total Value</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -30,7 +30,8 @@
               >)
             </td>
             <td>
-              {{ Number(item.current_price_per).toFixed(4) }}
+              {{ Number(item.current_price_per_unit).toFixed(4) }} /
+              {{ Number(item.average_cost_per_unit) }}
             </td>
             <td>
               <input
@@ -45,7 +46,7 @@
                 class="editable-button"
                 @click="startEditingAverageCost(item.id, item.average_cost_per_unit)"
               >
-                {{ Number(item.average_cost_per_unit).toFixed(4) }}
+                {{ Number(item.total_value).toFixed(4) }}
               </span>
             </td>
             <td>
@@ -157,13 +158,13 @@ const fetchHoldings = async () => {
     const enrichedHoldings = data.map((item) => {
       const code = item.currency_code
       const amount = parseFloat(item.amount_held)
-      const rate = exchangeRates[code] ?? 0
-      const current_price_per_unit = parseFloat((amount * rate).toFixed(2))
+      const current_price_per_unit = exchangeRates[code] ?? 0
+      const total_value = parseFloat((amount * current_price_per_unit).toFixed(2))
 
       return {
         ...item,
-        exchange_rate: rate,
-        current_price_per: current_price_per_unit,
+        total_value: total_value,
+        current_price_per_unit: current_price_per_unit,
       }
     })
 

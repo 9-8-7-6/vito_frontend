@@ -43,7 +43,6 @@ export async function currencyScraper(codes: string[]): Promise<CurrencyMap> {
         }
       }
     })
-    console.log('result', result)
     return result
   } catch (error) {
     console.error('[currencyScraper] Fetch error:', error)
